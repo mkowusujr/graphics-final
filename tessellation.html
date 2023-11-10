@@ -77,18 +77,18 @@
         curShape = CUBE;
 
         //  incremental rotation
-        if (key == 'x')
-            angles[0] -= angleInc;
-        else if (key == 'y')
-            angles[1] -= angleInc;
-        else if (key == 'z')
-            angles[2] -= angleInc;
-        else if (key == 'X')
-            angles[0] += angleInc;
-        else if (key == 'Y')
-            angles[1] += angleInc;
-        else if (key == 'Z')
-            angles[2] += angleInc;
+        if (key == 'left')
+          angles[0] -= angleInc;
+        else if (key == 'right')
+          angles[0] += angleInc;
+        else if (key == 'up')
+          angles[1] -= angleInc;
+        else if (key == 'down')
+          angles[1] += angleInc;
+        else if (key == '-')
+          angles[2] -= angleInc;
+        else if (key == '=')
+          angles[2] += angleInc;
 
         // reset
         else if (key == 'r' || key=='R') {
@@ -118,16 +118,16 @@
   <table border="1">
     <tbody>
       <tr>
-        <td>x, y, z</td>
-        <td>Rotate cam</td>
-      </tr>
-      <tr>
-        <td>X, Y, Z</td>
+        <td>u,d,l,r,-,=</td>
         <td>Rotate cam rev</td>
       </tr>
       <tr>
         <td>r, R</td>
         <td>Reset pos & rot</td>
+      </tr>
+      <tr>
+        <td>a,s,w,d,q,e</td>
+        <td>Move cam</td>
       </tr>
     </tbody>
   </table>
