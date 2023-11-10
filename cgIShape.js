@@ -201,7 +201,7 @@ function radians(degrees)
  * Adds a triangle to the points array
  */
 function addTriangle (x0,y0,z0,x1,y1,z1,x2,y2,z2) {
-    const nverts = points.length / 4;
+    let nverts = points.length / 4;
     const coords = [[x0, y0, z0], [x1, y1, z1], [x2, y2, z2]]
     const dim = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 
