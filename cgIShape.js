@@ -191,44 +191,28 @@ function makeSphere(slices, stacks) {
     }
 }
 
-////////////////////////////////////////////////////////////////////
-//
-//  Do not edit below this line
-//
-///////////////////////////////////////////////////////////////////
-
 function radians(degrees)
 {
   var pi = Math.PI;
   return degrees * (pi/180);
 }
 
+/**
+ * Adds a triangle to the points array
+ */
 function addTriangle (x0,y0,z0,x1,y1,z1,x2,y2,z2) {
+    const nverts = points.length / 4;
+    const coords = [[x0, y0, z0], [x1, y1, z1], [x2, y2, z2]]
+    const dim = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 
-    
-    var nverts = points.length / 4;
-    
-    // push first vertex
-    points.push(x0);  bary.push (1.0);
-    points.push(y0);  bary.push (0.0);
-    points.push(z0);  bary.push (0.0);
-    points.push(1.0);
-    indices.push(nverts);
-    nverts++;
-    
-    // push second vertex
-    points.push(x1); bary.push (0.0);
-    points.push(y1); bary.push (1.0);
-    points.push(z1); bary.push (0.0);
-    points.push(1.0);
-    indices.push(nverts);
-    nverts++
-    
-    // push third vertex
-    points.push(x2); bary.push (0.0);
-    points.push(y2); bary.push (0.0);
-    points.push(z2); bary.push (1.0);
-    points.push(1.0);
-    indices.push(nverts);
-    nverts++;
+    // Push all vertices
+    for (let i = 0; i < dim.length; i++){
+        for (let j = 0; j < dim[i].length; j++){
+            points.push(coords[i][j]);
+            bary.push(dim[i][j]);
+        }
+        points.push(1.0);
+        indices.push(nverts);
+        nverts++;
+    }
 }
