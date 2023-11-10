@@ -180,9 +180,9 @@ function makeSphere (slices, stacks) {
             var lon0 = j * lonStep;
             var lon1 = lon0 + lonStep;
             const rsinlat0 = r * sin(lat0);
-            const sinlat1 = sin(lat1)
+            const rsinlat1 = r * sin(lat1)
             const sinlon0 = sin(lon0);
-            
+
             const sinlon1 = sin(lon1)
             const coslon0 = cos(lon0)
             const coslon1 = cos(lon1)
@@ -193,10 +193,10 @@ function makeSphere (slices, stacks) {
             x1 = rsinlat0 * coslon1;
             y1 = rsinlat0 * sinlon1;
 
-            x2 = r * sinlat1 * coslon0;
-            y2 = r * sinlat1 * sinlon0;
-            x3 = r * sinlat1 * coslon1;
-            y3 = r * sinlat1 * sinlon1;
+            x2 = rsinlat1 * coslon0;
+            y2 = rsinlat1 * sinlon0;
+            x3 = rsinlat1 * coslon1;
+            y3 = rsinlat1 * sinlon1;
             z1 = r * cos(lat1);
 
             if (i == 0){
