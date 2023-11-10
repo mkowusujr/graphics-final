@@ -71,36 +71,65 @@
     <script type="text/javascript">
     
     function gotKey (event) {
-        var key = event.key;
+      var key = event.key;
 
-        //todo delete this at some point
-        curShape = CUBE;
+      //todo delete this at some point
+      curShape = CUBE;
 
-        //  incremental rotation
-        if (key == 'left')
-          angles[0] -= angleInc;
-        else if (key == 'right')
-          angles[0] += angleInc;
-        else if (key == 'up')
-          angles[1] -= angleInc;
-        else if (key == 'down')
-          angles[1] += angleInc;
-        else if (key == '-')
-          angles[2] -= angleInc;
-        else if (key == '=')
-          angles[2] += angleInc;
-
-        // reset
-        else if (key == 'r' || key=='R') {
-            angles[0] = anglesReset[0];
-            angles[1] = anglesReset[1];
-            angles[2] = anglesReset[2];
-            //todo position reset
-        }
+      let angleIndex = 0;
+      let angleIncVal = 0;
+      switch (key){
+        // Increment rotation
+        case 'i':
+          angleIndex = 0;
+          angleIncVal = -angleInc;
+          break;
+        case 'k':
+          angleIndex = 0;
+          angleIncVal = angleInc;
+          break;
+        case 'j':
+          angleIndex = 1;
+          angleIncVal = -angleInc;
+          break;
+        case 'l':
+          angleIndex = 1;
+          angleIncVal = angleInc;
+          break;
+        case 'u':
+          angleIndex = 2;
+          angleIncVal = -angleInc;
+          break;
+        case 'o':
+          angleIndex = 2;
+          angleIncVal = angleInc;
+          break;
+        // Increment position
+        case 'a':
+          break;
+        case 'd':
+          break;
+        case 'w':
+          break;
+        case 's':
+          break;
+        case 'q':
+          break;
+        case 'e':
+          break;
+        // Reset position and angle
+        case 'r':
+          angles[0] = anglesReset[0];
+          angles[1] = anglesReset[1];
+          angles[2] = anglesReset[2];
+          //todo position reset
+          break;
+      }
+      angles[angleIndex] += angleIncVal;
         
-        // create a new shape and do a redo a draw
-        createNewShape();
-        draw();
+      // Create a new shape and do a redo a draw
+      createNewShape();
+      draw();
     }
     
     </script>
@@ -118,11 +147,11 @@
   <table border="1">
     <tbody>
       <tr>
-        <td>u,d,l,r,-,=</td>
+        <td>j,k,i,l,u,o</td>
         <td>Rotate cam rev</td>
       </tr>
       <tr>
-        <td>r, R</td>
+        <td>r,R</td>
         <td>Reset pos & rot</td>
       </tr>
       <tr>
