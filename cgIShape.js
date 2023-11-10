@@ -1,3 +1,5 @@
+const origin = 0;
+const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);
 let cos = (theta) => Math.cos(theta);
 
@@ -151,42 +153,62 @@ function makeCone(radialdivision, heightdivision) {
 // For this function, you will implement the tessellation method based
 // on spherical coordinates as described in the video (as opposed to the
 //recursive subdivision method).
-function makeSphere(slices, stacks) {
-    slices = slices < 3 ? 3 : slices; // xs
-    stacks = stacks < 3 ? 3 : stacks; // ys
-    const pi = 3.14;
-    const radius = 0.5;
+function makeSphere (slices, stacks) {
+    if (slices < 3){
+        slices = 3;
+    }
+    if (stacks < 3){
+        stacks = 4;
+    }
+    else if (stacks % 2 == 1){
+        stacks++;
+    }
+    const dim = 1;
+    const r = dim / 2;
+    const lastStack = stacks - 1;
+    const latStep = pi / stacks;
+    const lonStep = 2 * pi / slices;
 
-    let latStep = pi / stacks;
-    let lonStep = (2 * pi) / slices;
+    for (let i = 0; i < stacks; i++){
 
-    let x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3, lon0, lat0, lon1, lat1;
+        let x0, x1, x2, x3, y0, y1, y2, y3, z0, z1;
 
-    for (let y = 0; y < stacks; y++) {
-        lat0 = y * latStep;
-        lat1 = (y + 1) * latStep;
-        for (let x = 0; x < slices; x++) {
-            lon0 = x * lonStep;
-            lon1 = (x + 1) * lonStep;
+        var lat0 = i * latStep;
+        var lat1 = lat0 + latStep;
 
-            x0 = radius * sin(lat0) * cos(lon0);
-            y0 = radius * sin(lat0) * sin(lon0);
-            z0 = radius * cos(lat0);
+        for (let j = 0; j < slices; j++){
+            var lon0 = j * lonStep;
+            var lon1 = lon0 + lonStep;
+            const rsinlat0 = r * sin(lat0);
+            const sinlat1 = sin(lat1)
+            const sinlon0 = sin(lon0);
+            
+            const sinlon1 = sin(lon1)
+            const coslon0 = cos(lon0)
+            const coslon1 = cos(lon1)
 
-            x1 = radius * sin(lat0) * cos(lon1);
-            y1 = radius * sin(lat0) * sin(lon1);
-            z1 = radius * cos(lat0);
+            x0 = rsinlat0 * coslon0;
+            y0 = rsinlat0 * sinlon0;
+            z0 = r * cos(lat0);
+            x1 = rsinlat0 * coslon1;
+            y1 = rsinlat0 * sinlon1;
 
-            x2 = radius * sin(lat1) * cos(lon0);
-            y2 = radius * sin(lat1) * sin(lon0);
-            z2 = radius * cos(lat1);
+            x2 = r * sinlat1 * coslon0;
+            y2 = r * sinlat1 * sinlon0;
+            x3 = r * sinlat1 * coslon1;
+            y3 = r * sinlat1 * sinlon1;
+            z1 = r * cos(lat1);
 
-            x3 = radius * sin(lat1) * cos(lon1);
-            y3 = radius * sin(lat1) * sin(lon1);
-            z3 = radius * cos(lat1);
-
-            addTriangle(x2, y2, z2, x0, y0, z0, x3, y3, z3);
-            addTriangle(x0, y0, z0, x1, y1, z1, x3, y3, z3);
+            if (i == 0){
+                addTriangle(x3, y3, z1, x2, y2, z1, origin, origin, r); // Draw base1
+            }
+            else if (i == lastStack){
+                addTriangle(x0, y0, z0, x1, y1, z0, origin, origin, -r); // Draw base0
+            }
+            else{
+                addTriangle(x1, y1, z0, x3, y3, z1, x0, y0, z0);
+                addTriangle(x2, y2, z1, x0, y0, z0, x3, y3, z1);
+            }
         }
     }
 }

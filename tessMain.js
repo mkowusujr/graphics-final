@@ -15,8 +15,8 @@
   var myIndexBuffer = null;
     
   // Other globals with default values;
-  var division1 = 3;
-  var division2 = 1;
+  var division1 = 50;
+  var division2 = 50;
   var updateDisplay = true;
   var anglesReset = [30.0, 30.0, 0.0];
   var angles = [30.0, 30.0, 0.0];
@@ -27,7 +27,7 @@
   var CYLINDER = 2;
   var CONE = 3;
   var SPHERE = 4;
-  var curShape = CUBE;
+  var curShape = SPHERE;
 
   // Given an id, extract the content's of a shader script
   // from the DOM and return the compiled shader
