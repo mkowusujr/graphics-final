@@ -183,43 +183,49 @@ function makeHemisphere (slices, stacks, xOrigin, yOrigin, zOrigin) {
         for (let j = 0; j < slices; j++){
             var lon0 = j * lonStep;
             var lon1 = lon0 + lonStep;
-            const rsinlat0 = r * sin(lat0);
-            const rsinlat1 = r * sin(lat1)
-            const sinlon0 = sin(lon0);
 
-            const sinlon1 = sin(lon1)
-            const coslon0 = cos(lon0)
-            const coslon1 = cos(lon1)
-
-            x0 = xOrigin + rsinlat0 * coslon0;
-            y0 = yOrigin + rsinlat0 * sinlon0;
-            z0 = zOrigin + r * cos(lat0);
-            x1 = xOrigin + rsinlat0 * coslon1;
-            y1 = yOrigin + rsinlat0 * sinlon1;
-            x2 = xOrigin + rsinlat1 * coslon0;
-            y2 = yOrigin + rsinlat1 * sinlon0;
-            x3 = xOrigin + rsinlat1 * coslon1;
-            y3 = yOrigin + rsinlat1 * sinlon1;
-            z1 = zOrigin + r * cos(lat1);
-
+            let coords = SphereHelp(lat0, lat1, lon0, lon1, r, xOrigin, yOrigin, zOrigin);
+            
             if (i == 0){
-                addTriangle(x3, y3, z1, x2, y2, z1, xOrigin, yOrigin, zOrigin + r); // Draw base1
+                addTriangle(coords.x3, coords.y3, coords.z1, coords.x2, coords.y2, coords.z1, xOrigin, yOrigin, zOrigin + r); // Draw base1
             }
             else if (i == lastHalfStack){
-                addTriangle(x0, y0, z0, x1, y1, z0, xOrigin, yOrigin, zOrigin); // Draw base0
+                addTriangle(coords.x0, coords.y0, coords.z0, coords.x1, coords.y1, coords.z0, xOrigin, yOrigin, zOrigin); // Draw base0
             }
             else{
-                addTriangle(x1, y1, z0, x3, y3, z1, x0, y0, z0);
-                addTriangle(x2, y2, z1, x0, y0, z0, x3, y3, z1);
+                addTriangle(coords.x1, coords.y1, coords.z0, coords.x3, coords.y3, coords.z1, coords.x0, coords.y0, coords.z0);
+                addTriangle(coords.x2, coords.y2, coords.z1, coords.x0, coords.y0, coords.z0, coords.x3, coords.y3, coords.z1);
             }
         }
     }
 }
 
-function radians(degrees)
-{
-  var pi = Math.PI;
-  return degrees * (pi/180);
+function SphereHelp(lat0, lat1, lon0, lon1, r, xOrigin, yOrigin, zOrigin) {
+    const rsinlat0 = r * sin(lat0);
+    const rsinlat1 = r * sin(lat1);
+    const sinlon0 = sin(lon0);
+
+    const sinlon1 = sin(lon1);
+    const coslon0 = cos(lon0);
+    const coslon1 = cos(lon1);
+
+    return {
+        'x0': xOrigin + rsinlat0 * coslon0,
+        'y0': yOrigin + rsinlat0 * sinlon0,
+        'z0': zOrigin + r * cos(lat0),
+        'x1': xOrigin + rsinlat0 * coslon1,
+        'y1': yOrigin + rsinlat0 * sinlon1,
+        'z1': zOrigin + r * cos(lat1),
+        'x2': xOrigin + rsinlat1 * coslon0,
+        'y2': yOrigin + rsinlat1 * sinlon0,
+        'x3': xOrigin + rsinlat1 * coslon1,
+        'y3': yOrigin + rsinlat1 * sinlon1
+    };
+}
+
+function radians(degrees) {
+    var pi = Math.PI;
+    return degrees * (pi/180);
 }
 
 /**
