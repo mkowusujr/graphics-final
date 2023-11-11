@@ -15,8 +15,8 @@
   var myIndexBuffer = null;
     
   // Other globals with default values;
-  var division1 = 50;
-  var division2 = 50;
+  var division1 = 10;
+  var division2 = 10;
   var updateDisplay = true;
   var anglesReset = [30.0, 30.0, 0.0];
   var angles = [30.0, 30.0, 0.0];
@@ -26,8 +26,8 @@
   var CUBE = 1;
   var CYLINDER = 2;
   var CONE = 3;
-  var SPHERE = 4;
-  var curShape = SPHERE;
+  var HEMISPHERE = 4;
+  var curShape = HEMISPHERE;
 
   // Given an id, extract the content's of a shader script
   // from the DOM and return the compiled shader
@@ -98,7 +98,7 @@
       if (curShape == CUBE) makeCube (division1);
       else if (curShape == CYLINDER) makeCylinder ( division1, division2);
       else if (curShape == CONE) makeCone ( division1, division2);
-      else if (curShape == SPHERE) makeSphere ( division1, division2);
+      else if (curShape == HEMISPHERE) makeHemisphere (division1, division2, 0, 0, 0);
       else
           console.error(`Bad object type`);
           

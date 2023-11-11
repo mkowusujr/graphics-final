@@ -146,14 +146,16 @@ function makeCone(radialdivision, heightdivision) {
     }
 }
 
-//
-// fill in code that creates the triangles for a sphere with diameter 1
-// (centered at the origin) with number of slides (longitude) given by
-// slices and the number of stacks (lattitude) given by stacks.
-// For this function, you will implement the tessellation method based
-// on spherical coordinates as described in the video (as opposed to the
-//recursive subdivision method).
-function makeSphere (slices, stacks) {
+/**
+ * Creates a hemisphere centered at xOrigin, yOrigin, zOrigin,
+ * with slices vertical sub-divisions and stacks horizontal sub-divisions
+ * @param {*} slices Vertical slices
+ * @param {*} stacks Horizontal slices
+ * @param {*} xOrigin Object origin x
+ * @param {*} yOrigin Object origin y
+ * @param {*} zOrigin Object origin z
+ */
+function makeHemisphere (slices, stacks, xOrigin, yOrigin, zOrigin) {
     if (slices < 3){
         slices = 3;
     }
@@ -163,13 +165,15 @@ function makeSphere (slices, stacks) {
     else if (stacks % 2 == 1){
         stacks++;
     }
+    stacks *= 2; // Restores the density of the tesselation
     const dim = 1;
     const r = dim / 2;
-    const lastStack = stacks - 1;
+    const halfStacks = stacks / 2 + 1;
+    const lastHalfStack = halfStacks - 1;
     const latStep = pi / stacks;
     const lonStep = 2 * pi / slices;
 
-    for (let i = 0; i < stacks; i++){
+    for (let i = 0; i < halfStacks; i++){
 
         let x0, x1, x2, x3, y0, y1, y2, y3, z0, z1;
 
@@ -187,23 +191,22 @@ function makeSphere (slices, stacks) {
             const coslon0 = cos(lon0)
             const coslon1 = cos(lon1)
 
-            x0 = rsinlat0 * coslon0;
-            y0 = rsinlat0 * sinlon0;
-            z0 = r * cos(lat0);
-            x1 = rsinlat0 * coslon1;
-            y1 = rsinlat0 * sinlon1;
-
-            x2 = rsinlat1 * coslon0;
-            y2 = rsinlat1 * sinlon0;
-            x3 = rsinlat1 * coslon1;
-            y3 = rsinlat1 * sinlon1;
-            z1 = r * cos(lat1);
+            x0 = xOrigin + rsinlat0 * coslon0;
+            y0 = yOrigin + rsinlat0 * sinlon0;
+            z0 = zOrigin + r * cos(lat0);
+            x1 = xOrigin + rsinlat0 * coslon1;
+            y1 = yOrigin + rsinlat0 * sinlon1;
+            x2 = xOrigin + rsinlat1 * coslon0;
+            y2 = yOrigin + rsinlat1 * sinlon0;
+            x3 = xOrigin + rsinlat1 * coslon1;
+            y3 = yOrigin + rsinlat1 * sinlon1;
+            z1 = zOrigin + r * cos(lat1);
 
             if (i == 0){
-                addTriangle(x3, y3, z1, x2, y2, z1, origin, origin, r); // Draw base1
+                addTriangle(x3, y3, z1, x2, y2, z1, xOrigin, yOrigin, zOrigin + r); // Draw base1
             }
-            else if (i == lastStack){
-                addTriangle(x0, y0, z0, x1, y1, z0, origin, origin, -r); // Draw base0
+            else if (i == lastHalfStack){
+                addTriangle(x0, y0, z0, x1, y1, z0, xOrigin, yOrigin, zOrigin); // Draw base0
             }
             else{
                 addTriangle(x1, y1, z0, x3, y3, z1, x0, y0, z0);
