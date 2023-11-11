@@ -98,7 +98,7 @@
       if (curShape == CUBE) makeCube (division1);
       else if (curShape == CYLINDER) makeCylinder (division1, division2);
       else if (curShape == CONE) makeCone (division1, division2);
-      else if (curShape == HEMISPHERE) makeHemisphere (division1, division2, 0, 0, 0);
+      else if (curShape == HEMISPHERE) makeHemisphere (division1, division2, {'x': 0, 'y': 0, 'z': 0});
       else
           console.error(`Bad object type`);
           

@@ -147,15 +147,13 @@ function makeCone(radialdivision, heightdivision) {
 }
 
 /**
- * Creates a hemisphere centered at xOrigin, yOrigin, zOrigin,
+ * Creates a hemisphere centered at origin.x, origin.y, origin.z,
  * with slices vertical sub-divisions and stacks horizontal sub-divisions
  * @param {*} slices Vertical slices
  * @param {*} stacks Horizontal slices
- * @param {*} xOrigin Object origin x
- * @param {*} yOrigin Object origin y
- * @param {*} zOrigin Object origin z
+ * @param {*} origin Point object of the hemisphere's origin point
  */
-function makeHemisphere (slices, stacks, xOrigin, yOrigin, zOrigin) {
+function makeHemisphere (slices, stacks, origin) {
     if (slices < 3){
         slices = 3;
     }
@@ -174,9 +172,6 @@ function makeHemisphere (slices, stacks, xOrigin, yOrigin, zOrigin) {
     const lonStep = 2 * pi / slices;
 
     for (let i = 0; i < halfStacks; i++){
-
-        let x0, x1, x2, x3, y0, y1, y2, y3, z0, z1;
-
         var lat0 = i * latStep;
         var lat1 = lat0 + latStep;
 
@@ -184,13 +179,13 @@ function makeHemisphere (slices, stacks, xOrigin, yOrigin, zOrigin) {
             var lon0 = j * lonStep;
             var lon1 = lon0 + lonStep;
 
-            let coords = SphereHelp(lat0, lat1, lon0, lon1, r, xOrigin, yOrigin, zOrigin);
+            let coords = HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin);
             
             if (i == 0){
-                addTriangle(coords.x3, coords.y3, coords.z1, coords.x2, coords.y2, coords.z1, xOrigin, yOrigin, zOrigin + r); // Draw base1
+                addTriangle(coords.x3, coords.y3, coords.z1, coords.x2, coords.y2, coords.z1, origin.x, origin.y, origin.z + r); // Draw base1
             }
             else if (i == lastHalfStack){
-                addTriangle(coords.x0, coords.y0, coords.z0, coords.x1, coords.y1, coords.z0, xOrigin, yOrigin, zOrigin); // Draw base0
+                addTriangle(coords.x0, coords.y0, coords.z0, coords.x1, coords.y1, coords.z0, origin.x, origin.y, origin.z); // Draw base0
             }
             else{
                 addTriangle(coords.x1, coords.y1, coords.z0, coords.x3, coords.y3, coords.z1, coords.x0, coords.y0, coords.z0);
@@ -200,7 +195,17 @@ function makeHemisphere (slices, stacks, xOrigin, yOrigin, zOrigin) {
     }
 }
 
-function SphereHelp(lat0, lat1, lon0, lon1, r, xOrigin, yOrigin, zOrigin) {
+/**
+ * Calculates all current points for the hemisphere
+ * @param {*} lat0 Current lat
+ * @param {*} lat1 Next lat
+ * @param {*} lon0 Current lon
+ * @param {*} lon1 Next lon
+ * @param {*} r Objects radius
+ * @param {*} origin Point object of the hemisphere's origin point
+ * @returns All 10 coordinates
+ */
+function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin) {
     const rsinlat0 = r * sin(lat0);
     const rsinlat1 = r * sin(lat1);
     const sinlon0 = sin(lon0);
@@ -210,16 +215,16 @@ function SphereHelp(lat0, lat1, lon0, lon1, r, xOrigin, yOrigin, zOrigin) {
     const coslon1 = cos(lon1);
 
     return {
-        'x0': xOrigin + rsinlat0 * coslon0,
-        'y0': yOrigin + rsinlat0 * sinlon0,
-        'z0': zOrigin + r * cos(lat0),
-        'x1': xOrigin + rsinlat0 * coslon1,
-        'y1': yOrigin + rsinlat0 * sinlon1,
-        'z1': zOrigin + r * cos(lat1),
-        'x2': xOrigin + rsinlat1 * coslon0,
-        'y2': yOrigin + rsinlat1 * sinlon0,
-        'x3': xOrigin + rsinlat1 * coslon1,
-        'y3': yOrigin + rsinlat1 * sinlon1
+        'x0': origin.x + rsinlat0 * coslon0,
+        'y0': origin.y + rsinlat0 * sinlon0,
+        'z0': origin.z + r * cos(lat0),
+        'x1': origin.x + rsinlat0 * coslon1,
+        'y1': origin.y + rsinlat0 * sinlon1,
+        'z1': origin.z + r * cos(lat1),
+        'x2': origin.x + rsinlat1 * coslon0,
+        'y2': origin.y + rsinlat1 * sinlon0,
+        'x3': origin.x + rsinlat1 * coslon1,
+        'y3': origin.y + rsinlat1 * sinlon1
     };
 }
 
