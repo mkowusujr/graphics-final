@@ -1,11 +1,11 @@
-const origin = 0;
+const origin = 0; //todo remove once all shape code is updated to use a given origin
 const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);
 let cos = (theta) => Math.cos(theta);
 
 //
 // fill in code that creates the triangles for a cube with dimensions 1x1x1
-// on each side (and t'he origin in the center of the cube). with an equal
+// on each side (and the origin in the center of the cube). with an equal
 // number of subdivisions along each cube face as given by the parameter
 //subdivisions
 //

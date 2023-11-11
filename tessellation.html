@@ -1,65 +1,62 @@
 <html>
 <head>
-    <title>CSCI-510: Tessellation</title>
-    <link rel="stylesheet" href="tess.css">
-    <!-- vertex Shader -->
-    <script id="vertex-shader" type="x-shader/x-vertex">
-        #version 300 es
-        in vec4 aVertexPosition;
-        in vec3 bary;
-        uniform vec3 theta;
-        
-        out vec3 vbc;
+  <title>CSCI-510: Tessellation</title>
+  <link rel="stylesheet" href="tess.css">
+  <!-- vertex Shader -->
+  <script id="vertex-shader" type="x-shader/x-vertex">
+    #version 300 es
+    in vec4 aVertexPosition;
+    in vec3 bary;
+    uniform vec3 theta;
+    
+    out vec3 vbc;
 
-        void main()
-        {
-            // Compute the sines and cosines of each rotation
-            // about each axis
-            vec3 angles = radians( theta );
-            vec3 c = cos( angles );
-            vec3 s = sin( angles );
+    void main()
+    {
+      // Compute the sines and cosines of each rotation
+      // about each axis
+      vec3 angles = radians(theta);
+      vec3 c = cos(angles);
+      vec3 s = sin(angles);
 
-            // rotation matrices
-            mat4 rx = mat4 ( 1.0,  0.0,  0.0,  0.0,
-                             0.0,  c.x,  s.x,  0.0,
-                             0.0, -s.x,  c.x,  0.0,
-                             0.0,  0.0,  0.0,  1.0 );
+      // rotation matrices
+      mat4 rx = mat4 (1.0,  0.0,  0.0,  0.0,
+                      0.0,  c.x,  s.x,  0.0,
+                      0.0, -s.x,  c.x,  0.0,
+                      0.0,  0.0,  0.0,  1.0);
 
-            mat4 ry = mat4 ( c.y,  0.0, -s.y,  0.0,
-                             0.0,  1.0,  0.0,  0.0,
-                             s.y,  0.0,  c.y,  0.0,
-                             0.0,  0.0,  0.0,  1.0 );
+      mat4 ry = mat4 (c.y,  0.0, -s.y,  0.0,
+                      0.0,  1.0,  0.0,  0.0,
+                      s.y,  0.0,  c.y,  0.0,
+                      0.0,  0.0,  0.0,  1.0);
 
-            mat4 rz = mat4 ( c.z,  s.z,  0.0,  0.0,
-                            -s.z,  c.z,  0.0,  0.0,
-                             0.0,  0.0,  1.0,  0.0,
-                             0.0,  0.0,  0.0,  1.0 );
+      mat4 rz = mat4 (c.z,  s.z,  0.0,  0.0,
+                      -s.z,  c.z,  0.0,  0.0,
+                      0.0,  0.0,  1.0,  0.0,
+                      0.0,  0.0,  0.0,  1.0);
 
-            gl_Position = rz * ry * rx * aVertexPosition;
-            vbc = bary;
-        }
+      gl_Position = rz * ry * rx * aVertexPosition;
+      vbc = bary;
+    }
     </script>
+    <!-- fragment Shader -->
+    <script id="fragment-shader" type="x-shader/x-fragment">
+      #version 300 es
+      precision mediump float;
+      
+      in vec3 vbc;
 
-     <!-- fragment Shader -->
-     <script id="fragment-shader" type="x-shader/x-fragment">
-         #version 300 es
-         precision mediump float;
-         
-         in vec3 vbc;
+      // Color that is the result of this shader
+      out vec4 fragColor;
 
-         // Color that is the result of this shader
-         out vec4 fragColor;
-
-         void main(void) {
-             
-             fragColor = vec4 (0.5, 0.5, 0.5, 1.0 );
-           // if on the edge, draw black, otherwsie, draw grey
-           if (vbc.x < 0.01 || vbc.y < 0.01 || vbc.z < 0.01) {
-             fragColor = vec4 (1.0, 1.0, 1.0, 1.0);
-           }
-         }
-
-     </script>
+      void main(void) {
+        fragColor = vec4 (0.5, 0.5, 0.5, 1.0);
+        // if on the edge, draw black, otherwsie, draw grey
+        if (vbc.x < 0.01 || vbc.y < 0.01 || vbc.z < 0.01) {
+          fragColor = vec4 (1.0, 1.0, 1.0, 1.0);
+        }
+      }
+    </script>
      
      <!-- include the shape creation functions -->
     <script type="text/javascript" src="./cgIShape.js"></script>
