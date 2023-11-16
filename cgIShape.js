@@ -163,15 +163,13 @@ function makeHemisphere (slices, stacks, origin) {
     else if (stacks % 2 == 1){
         stacks++;
     }
-    stacks *= 2; // Restores the density of the tesselation
     const dim = 1;
     const r = dim / 2;
-    const halfStacks = stacks / 2 + 1;
-    const lastHalfStack = halfStacks - 1;
-    const latStep = pi / stacks;
+    const stacks1 = stacks + 1;
+    const latStep = pi / (stacks*2);
     const lonStep = 2 * pi / slices;
 
-    for (let i = 0; i < halfStacks; i++){
+    for (let i = 0; i < stacks1; i++){
         var lat0 = i * latStep;
         var lat1 = lat0 + latStep;
 
@@ -184,7 +182,7 @@ function makeHemisphere (slices, stacks, origin) {
             if (i == 0){
                 addTriangle(coords.x3, coords.y3, coords.z1, coords.x2, coords.y2, coords.z1, origin.x, origin.y, origin.z + r); // Draw base1
             }
-            else if (i == lastHalfStack){
+            else if (i == stacks){
                 addTriangle(coords.x0, coords.y0, coords.z0, coords.x1, coords.y1, coords.z0, origin.x, origin.y, origin.z); // Draw base0
             }
             else{
