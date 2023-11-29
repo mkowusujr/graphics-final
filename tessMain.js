@@ -6,7 +6,8 @@
     program,
     points,
     bary,
-    indices;
+    indices,
+    canvas;
   
   // VAO stuff
   var myVAO = null;
@@ -27,7 +28,6 @@
   var CYLINDER = 2;
   var CONE = 3;
   var HEMISPHERE = 4;
-  var curShape = HEMISPHERE;
 
   // Given an id, extract the content's of a shader script
   // from the DOM and return the compiled shader
@@ -85,6 +85,11 @@
     program.uTheta = gl.getUniformLocation (program, 'theta');
   }
 
+function createScene() {
+    
+    // makeCylinder(division1, division2, origin);
+  }
+
   // general call to make and bind a new object based on current
   // settings..Basically a call to shape specfic calls in cgIshape.js
   function createNewShape() {
@@ -92,15 +97,17 @@
       // clear your points and elements
       points = [];
       indices = [];
-      bary = [];
-      
-      // make your shape based on type
-      if (curShape == CUBE) makeCube (division1);
-      else if (curShape == CYLINDER) makeCylinder (division1, division2);
-      else if (curShape == CONE) makeCone (division1, division2);
-      else if (curShape == HEMISPHERE) makeHemisphere (division1, division2, {'x': 0, 'y': 0, 'z': 0});
-      else
-          console.error(`Bad object type`);
+    bary = [];
+    let origin = Point.create([0,0,0])
+    makeHemisphere(division1, division2, origin);
+    createScene()
+      // // make your shape based on type
+      // if (curShape == CUBE) makeCube(division1, origin);
+      // else if (curShape == CYLINDER) makeCylinder(division1, division2, origin);
+      // else if (curShape == CONE) makeCone(division1, division2, origin);
+      // else if (curShape == HEMISPHERE) makeHemisphere (division1, division2, origin);
+      // else
+      //     console.error(`Bad object type`);
           
       //create and bind VAO
       if (myVAO == null) myVAO = gl.createVertexArray();
@@ -159,11 +166,15 @@
   // Entry point to our application
   function init() {
     // Retrieve the canvas
-    const canvas = document.getElementById('webgl-canvas');
+    canvas = document.getElementById('webgl-canvas');
     if (!canvas) {
       console.error(`There is no canvas with id ${'webgl-canvas'} on this page.`);
       return null;
     }
+
+    // Set the canvas to the size of the screen
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     // deal with keypress
     window.addEventListener('keydown', gotKey ,false);

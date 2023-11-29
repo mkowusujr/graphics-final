@@ -1,7 +1,76 @@
-const origin = 0; //todo remove once all shape code is updated to use a given origin
+ //todo remove once all shape code is updated to use a given origin
 const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);
 let cos = (theta) => Math.cos(theta);
+let normalizeX = (x) => x//(x / canvas.width) * 2 - 1,
+    normalizeY = (y) => y//1 - (y / canvas.height) * 2, // Invert y to match the canvas coordinate system
+    normalizeZ = (z) => z//(z / canvas.height) * 2 - 1;
+
+
+        
+class Triangle {
+    constructor(point0, point1, point2) {
+        this.point0 = point0;
+        this.point1 = point1;
+        this.point2 = point2;
+        console.log(JSON.stringify(this))
+    }
+
+    static create(p0, p1, p2) {
+        return new Triangle(p0, p1, p2);
+    }
+
+    // takes in a list of nine values
+    static create(points) {
+        let p0 = Point.create(points.slice(0, 3));
+        let p1 = Point.create(points.slice(3, 6));
+        let p2 = Point.create(points.slice(6, 9));
+        return new Triangle(p0, p1, p2);
+    }
+
+    draw() {
+        let nverts = points.length / 4;
+        const coords = [
+            this.point0.toList(), //[x0, y0, z0],
+            this.point1.toList(), //[x1, y1, z1],
+            this.point2.toList(), //[x2, y2, z2],
+        ];
+        const dim = [
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ];
+
+        // Push all vertices
+        for (let i = 0; i < dim.length; i++) {
+            for (let j = 0; j < dim[i].length; j++) {
+                points.push(coords[i][j]);
+                bary.push(dim[i][j]);
+            }
+            points.push(1);
+            indices.push(nverts);
+            nverts++;
+        }
+    }
+}
+
+class Point {
+    constructor(x, y, z) {
+        this.x = normalizeX(x);
+        this.y = normalizeY(y);
+        this.z = normalizeZ(z);
+    }
+    static create(x, y, z) {
+        return new new Point(x, y, z)();
+    }
+    static create(coords) {
+        return new Point(coords[0], coords[1], coords[2]);
+    }
+    toList() {
+        return [this.x, this.y, this.z];
+    }
+}
+
 
 //
 // fill in code that creates the triangles for a cube with dimensions 1x1x1
@@ -9,8 +78,8 @@ let cos = (theta) => Math.cos(theta);
 // number of subdivisions along each cube face as given by the parameter
 //subdivisions
 //
-function makeCube(subdivisions) {
-    const depth = 0.5;
+function makeCube(subdivisions, origin) {
+    const depth = 0.5 + origin.x;
     const t = 1 / subdivisions;
     let u0, v0, u1, v1;
 
@@ -58,10 +127,9 @@ function makeCube(subdivisions) {
 // the number of subdivisions along the surface of the cylinder given by
 //heightdivision.
 //
-function makeCylinder(radialdivision, heightdivision) {
+function makeCylinder(radialdivision, heightdivision, origin) {
     const pi = 3.14;
     const radius = 0.5;
-    const origin = 0;
     heightdivision = heightdivision < 1 ? 1 : heightdivision;
     radialdivision = radialdivision < 3 ? 3 : radialdivision;
     const t = 1 / heightdivision;
@@ -76,10 +144,10 @@ function makeCylinder(radialdivision, heightdivision) {
         z1 = radius * sin(a1);
 
         // Draw Top Face
-        addTriangle(x0, radius, z0, x1, radius, z1, origin, radius, origin);
+        addTriangle(x0, radius, z0, x1, radius, z1, origin.x, radius, origin.z);
 
         // Draw Bottom Face
-        addTriangle(origin, -radius, origin, x1, -radius, z1, x0, -radius, z0);
+        addTriangle(origin.x, -radius, origin.z, x1, -radius, z1, x0, -radius, z0);
 
         for (let y = 0; y < heightdivision; y++) {
             y0 = y * t - radius; //  height change
@@ -98,10 +166,9 @@ function makeCylinder(radialdivision, heightdivision) {
 // and the number of subdivisions along the surface of the cone
 //given by heightdivision.
 //
-function makeCone(radialdivision, heightdivision) {
+function makeCone(radialdivision, heightdivision, origin) {
     const pi = 3.14;
     const radius = 0.5;
-    const origin = 0;
     heightdivision = heightdivision < 1 ? 1 : heightdivision;
     radialdivision = radialdivision < 3 ? 3 : radialdivision;
     const t = 1 / heightdivision;
@@ -116,7 +183,8 @@ function makeCone(radialdivision, heightdivision) {
         z1 = radius * sin(a1);
 
         // Draw Bottom Face
-        addTriangle(origin, -radius, origin, x1, -radius, z1, x0, -radius, z0);
+        let bottomTriangle = Triangle.create([origin.x, -radius, origin.z, x1, -radius, z1, x0, -radius, z0])
+        bottomTriangle.draw()
 
         // Draw Side Face
         for (let y = 0; y < heightdivision; y++) {
@@ -130,8 +198,12 @@ function makeCone(radialdivision, heightdivision) {
                 x3 = radius2 * cos(a1);
                 z3 = radius2 * sin(a1);
 
-                addTriangle(x1, y0, z1, x3, y1, z3, x0, y0, z0);
-                addTriangle(x2, y1, z2, x0, y0, z0, x3, y1, z3);
+                let sideTriangle0 = Triangle.create([x1, y0, z1, x3, y1, z3, x0, y0, z0]);
+
+                let sideTriangle1 = Triangle.create([x2, y1, z2, x0, y0, z0, x3, y1, z3])
+
+                sideTriangle0.draw()
+                sideTriangle1.draw()
 
                 // Remember Previous points to start from
                 x0 = x2;
@@ -140,7 +212,8 @@ function makeCone(radialdivision, heightdivision) {
                 z1 = z3;
             } else {
                 // Draw Top Cone
-                addTriangle(x1, y0, z1, origin, y1, origin, x0, y0, z0);
+                let topTriangle = Triangle.create([x1, y0, z1, origin.x, y1, origin.z, x0, y0, z0])
+                topTriangle.draw()
             }
         }
     }
@@ -153,41 +226,45 @@ function makeCone(radialdivision, heightdivision) {
  * @param {*} stacks Horizontal slices
  * @param {*} origin Point object of the hemisphere's origin point
  */
-function makeHemisphere (slices, stacks, origin) {
-    if (slices < 3){
-        slices = 3;
-    }
-    if (stacks < 3){
-        stacks = 4;
-    }
-    else if (stacks % 2 == 1){
-        stacks++;
-    }
+function makeHemisphere(slices, stacks, origin) {
+    slices = slices < 3 ? 3 : slices;
+    stacks = stacks < 4 ? 4 : stacks % 2 == 1 ? stacks++ : stacks;
     const dim = 1;
     const r = dim / 2;
-    const stacks1 = stacks + 1;
-    const latStep = pi / (stacks*2);
-    const lonStep = 2 * pi / slices;
+    const latStep =  pi / (stacks * 2);
+    const lonStep = (2 * pi) / slices;
 
-    for (let i = 0; i < stacks1; i++){
+    for (let i = 0; i <= stacks; i++) {
         var lat0 = i * latStep;
         var lat1 = lat0 + latStep;
 
-        for (let j = 0; j < slices; j++){
+        for (let j = 0; j < slices; j++) {
             var lon0 = j * lonStep;
             var lon1 = lon0 + lonStep;
 
             let coords = HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin);
-            
-            if (i == 0){
-                addTriangle(coords.x3, coords.y3, coords.z1, coords.x2, coords.y2, coords.z1, origin.x, origin.y, origin.z + r); // Draw base1
-            }
-            else if (i == stacks){
-                addTriangle(coords.x0, coords.y0, coords.z0, coords.x1, coords.y1, coords.z0, origin.x, origin.y, origin.z); // Draw base0
-            }
-            else{
-                addTriangle(coords.x1, coords.y1, coords.z0, coords.x3, coords.y3, coords.z1, coords.x0, coords.y0, coords.z0);
-                addTriangle(coords.x2, coords.y2, coords.z1, coords.x0, coords.y0, coords.z0, coords.x3, coords.y3, coords.z1);
+
+            if (i == 0) {
+                // Draw Top
+                let triangle = Triangle.create([coords.x3, coords.y3, coords.z1, coords.x2, coords.y2, coords.z1, origin.x, origin.y, origin.z + r]);
+
+                triangle.draw();
+            } else if (i == stacks) {
+                // Draw Base
+                let triangle = Triangle.create([ coords.x0, coords.y0, coords.z0, coords.x1, coords.y1, coords.z0, origin.x, origin.y, origin.z
+                ]);
+
+                triangle.draw();
+            } else {
+                // Draw Sides
+                let triangle0 = Triangle.create([ coords.x1, coords.y1, coords.z0, coords.x3, coords.y3, coords.z1, coords.x0, coords.y0, coords.z0
+                ]);
+
+                let triangle1 = Triangle.create([ coords.x2, coords.y2, coords.z1, coords.x0, coords.y0, coords.z0, coords.x3, coords.y3, coords.z1
+                ]);
+
+                triangle0.draw();
+                triangle1.draw();
             }
         }
     }
@@ -213,35 +290,43 @@ function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin) {
     const coslon1 = cos(lon1);
 
     return {
-        'x0': origin.x + rsinlat0 * coslon0,
-        'y0': origin.y + rsinlat0 * sinlon0,
-        'z0': origin.z + r * cos(lat0),
-        'x1': origin.x + rsinlat0 * coslon1,
-        'y1': origin.y + rsinlat0 * sinlon1,
-        'z1': origin.z + r * cos(lat1),
-        'x2': origin.x + rsinlat1 * coslon0,
-        'y2': origin.y + rsinlat1 * sinlon0,
-        'x3': origin.x + rsinlat1 * coslon1,
-        'y3': origin.y + rsinlat1 * sinlon1
+        x0: origin.x + rsinlat0 * coslon0,
+        y0: origin.y + rsinlat0 * sinlon0,
+        z0: origin.z + r * cos(lat0),
+        x1: origin.x + rsinlat0 * coslon1,
+        y1: origin.y + rsinlat0 * sinlon1,
+        z1: origin.z + r * cos(lat1),
+        x2: origin.x + rsinlat1 * coslon0,
+        y2: origin.y + rsinlat1 * sinlon0,
+        x3: origin.x + rsinlat1 * coslon1,
+        y3: origin.y + rsinlat1 * sinlon1,
     };
 }
 
 function radians(degrees) {
     var pi = Math.PI;
-    return degrees * (pi/180);
+    return degrees * (pi / 180);
 }
 
 /**
  * Adds a triangle to the points array
  */
-function addTriangle (x0,y0,z0,x1,y1,z1,x2,y2,z2) {
+function addTriangle(x0, y0, z0, x1, y1, z1, x2, y2, z2) {
     let nverts = points.length / 4;
-    const coords = [[x0, y0, z0], [x1, y1, z1], [x2, y2, z2]]
-    const dim = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+    const coords = [
+        [x0, y0, z0],
+        [x1, y1, z1],
+        [x2, y2, z2],
+    ];
+    const dim = [
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
+    ];
 
     // Push all vertices
-    for (let i = 0; i < dim.length; i++){
-        for (let j = 0; j < dim[i].length; j++){
+    for (let i = 0; i < dim.length; i++) {
+        for (let j = 0; j < dim[i].length; j++) {
             points.push(coords[i][j]);
             bary.push(dim[i][j]);
         }
