@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>CSCI-510: Tessellation</title>
+  <title>Island</title>
   <link rel="stylesheet" href="tess.css">
   <!-- vertex Shader -->
   <script id="vertex-shader" type="x-shader/x-vertex">
@@ -42,7 +42,6 @@
                         0.0, tsc[2], 0.0, tsc[1],
                         0.0, 0.0, tsc[2], 0.0/*tsc[2]*/,//TODO tsc[2]
                         0.0, 0.0, 0.0, 1.0);
-
       gl_Position = rz * ry * rx * aVertexPosition * tscxyz;
       vbc = bary;
     }
@@ -112,41 +111,41 @@
         case 'a':
           //todo add camera movement
           translationIndex = 0;
-          translationIncVal = translationInc;
+          translationIncVal = -translationInc;
           break;
         case 'd':
-          //todo add camera movement
           translationIndex = 0;
           translationIncVal = translationInc;
           break;
         case 'w':
-          //todo add camera movement
-          translationIndex = 0;
+          translationIndex = 1;
           translationIncVal = translationInc;
           break;
         case 's':
-          //todo add camera movement
-          translationIndex = 0;
-          translationIncVal = translationInc;
+          translationIndex = 1;
+          translationIncVal = -translationInc;
           break;
         case 'q':
-          //todo add camera movement
-          translationIndex = 0;
+          translationIndex = 2;
           translationIncVal = translationInc;
           break;
         case 'e':
-          //todo add camera movement
-          translationIndex = 0;
-          translationIncVal = translationInc;
+          translationIndex = 2;
+          translationIncVal = -translationInc;
           break;
         // Reset position and angle
         case 'r':
-          angles = anglesReset;
-          translations = translationsReset;
+        case 'R':
+          angles = [...anglesReset];
+          translations = [...translationsReset];
           break;
       }
+      console.log(translations[2]); //TODO remove this print
       angles[angleIndex] += angleIncVal;
       translations[translationIndex] += translationIncVal;
+      if (translations[2] < translationInc){
+          translations[2] = translationInc;
+      }
         
       // Create a new shape and do a redo a draw
       createNewShape();

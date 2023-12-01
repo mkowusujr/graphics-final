@@ -19,12 +19,15 @@
   var division1 = 10;
   var division2 = 10;
   var updateDisplay = true;
+
   var anglesReset = [60.0, 0.0, 0.0];
-  var angles = anglesReset;
+  var angles = [...anglesReset];
   var angleInc = 5.0;
+
   var translationsReset = [0.0, 0.0, 1.0];
-  var translations = translationsReset;
+  var translations = [...translationsReset];
   var translationInc = 0.05;
+  const translationMinZ = 0;
   
   // Shapes we v draw
   var CUBE = 1;
