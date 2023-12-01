@@ -129,7 +129,7 @@ function makeCube(subdivisions, origin, dim) {
 function makeCylinder(radialdivision, heightdivision, origin, dim) {
     heightdivision = heightdivision < 1 ? 1 : heightdivision;
     radialdivision = radialdivision < 3 ? 3 : radialdivision;
-    const r = dim / 2;
+    const r = 0.5;
     const t = 1 / heightdivision;
     const beta = 2 * pi / radialdivision;
     for(let i = 0; i < radialdivision; i++){
