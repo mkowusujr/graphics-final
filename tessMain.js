@@ -98,8 +98,9 @@ function createScene() {
       points = [];
       indices = [];
     bary = [];
-    let origin = Point.create([0,0,0])
-    makeHemisphere(division1, division2, origin);
+    let origin = Point.create([0, 0, 0])
+    let dim = { x: 1, y: 1, z: 2 }
+    makeHemisphere(division1, division2, origin, dim);
     createScene()
       // // make your shape based on type
       // if (curShape == CUBE) makeCube(division1, origin);
