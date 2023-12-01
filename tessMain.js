@@ -93,8 +93,13 @@
   }
 
 function createScene() {
-    
-    // makeCylinder(division1, division2, origin);
+  let originForTrunk = Point.create([0, 0, 0])
+  let dimForTrunk = { x: .5, y: 2, z: 1 }  
+  makeCylinder(division1, division2, originForTrunk, dimForTrunk);
+  
+//     let originForGround = Point.create([0, 0, 0])
+//     let dimForGround = { x: 1, y: 1, z: 2 }
+//   makeHemisphere(division1, division2, originForGround, dimForGround);
   }
 
   // general call to make and bind a new object based on current
@@ -105,9 +110,7 @@ function createScene() {
       points = [];
       indices = [];
     bary = [];
-    let origin = Point.create([0, 0, 0])
-    let dim = { x: 1, y: 1, z: 2 }
-    makeHemisphere(division1, division2, origin, dim);
+    
     createScene()
       // // make your shape based on type
       // if (curShape == CUBE) makeCube(division1, origin);
