@@ -93,13 +93,13 @@
   }
 
 function createScene() {
-  let originForTrunk = Point.create([0, 0, 0])
-  let dimForTrunk = { x: .5, y: 2, z: 1 }  
+  let dimForTrunk = { x: .5, y: 2, z: 1 }
+  let originForTrunk = Point.create([0, 0, -dimForTrunk.z / 2])
   makeCylinder(division1, division2, originForTrunk, dimForTrunk);
   
-//     let originForGround = Point.create([0, 0, 0])
-//     let dimForGround = { x: 1, y: 1, z: 2 }
-//   makeHemisphere(division1, division2, originForGround, dimForGround);
+    let originForGround = Point.create([0, 0, 0])
+    let dimForGround = { x: 1, y: 1, z: 2 }
+  makeHemisphere(division1, division2, originForGround, dimForGround);
   }
 
   // general call to make and bind a new object based on current
