@@ -22,11 +22,11 @@
   var anglesReset = [60.0, 0.0, 0.0];
   var angles = anglesReset;
   var angleInc = 5.0;
-  var translationsReset = [0.0, 0.0, 0.0];
+  var translationsReset = [0.0, 0.0, 1.0];
   var translations = translationsReset;
-  var translationInc = 1.0;
+  var translationInc = 0.05;
   
-  // Shapes we can draw
+  // Shapes we v draw
   var CUBE = 1;
   var CYLINDER = 2;
   var CONE = 3;
@@ -85,7 +85,8 @@
     // for easy access later in the code
     program.aVertexPosition = gl.getAttribLocation(program, 'aVertexPosition');
     program.aBary = gl.getAttribLocation(program, 'bary');
-    program.uTheta = gl.getUniformLocation (program, 'theta');
+    program.uTheta = gl.getUniformLocation(program, 'theta');
+    program.uTranslation = gl.getUniformLocation(program, 'translation');
   }
 
 function createScene() {
@@ -132,7 +133,8 @@ function createScene() {
       gl.vertexAttribPointer(program.aBary, 3, gl.FLOAT, false, 0, 0);
       
       // uniform values
-      gl.uniform3fv (program.uTheta, new Float32Array(angles));
+    gl.uniform3fv(program.uTheta, new Float32Array(angles));
+    gl.uniform3fv(program.uTranslation, new Float32Array(translations))
       
       // Setting up the IBO
       if (myIndexBuffer == null) myIndexBuffer = gl.createBuffer();

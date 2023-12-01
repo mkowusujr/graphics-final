@@ -249,7 +249,7 @@ function makeHemisphere(slices, stacks, origin, dim) {
 
             if (i == 0) {
                 // Draw Top
-                let triangle = Triangle.create([coords.x3, coords.y3, coords.z1, coords.x2, coords.y2, coords.z1, origin.x, origin.y, origin.z + r * dim.z]);
+                let triangle = Triangle.create([coords.x3, coords.y3, coords.z1, coords.x2, coords.y2, coords.z1, origin.x, origin.y, origin.z + r* dim.z]);
 
                 triangle.draw();
             } else if (i == stacks) {
