@@ -19,9 +19,12 @@
   var division1 = 10;
   var division2 = 10;
   var updateDisplay = true;
-  var anglesReset = [30.0, 30.0, 0.0];
-  var angles = [30.0, 30.0, 0.0];
+  var anglesReset = [60.0, 0.0, 0.0];
+  var angles = anglesReset;
   var angleInc = 5.0;
+  var translationsReset = [0.0, 0.0, 0.0];
+  var translations = translationsReset;
+  var translationInc = 1.0;
   
   // Shapes we can draw
   var CUBE = 1;

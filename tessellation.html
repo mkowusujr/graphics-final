@@ -18,6 +18,8 @@
       vec3 angles = radians(theta);
       vec3 c = cos(angles);
       vec3 s = sin(angles);
+      vec3 t = vec3(0.0, 0.0, 0.0);
+      //vec3 t = vec3(translations);
 
       // rotation matrices
       mat4 rx = mat4 (1.0,  0.0,  0.0,  0.0,
@@ -36,20 +38,12 @@
                       0.0,  0.0,  0.0,  1.0);
 
       // TODO add translations matrices for camera movement
-      mat4 tx = mat4 (0.0, 0.0, 0.0, 0.0,
-                      0.0, 0.0, 0.0, 0.0,
-                      0.0, 0.0, 0.0, 0.0,
-                      0.0, 0.0, 0.0, 0.0);
-      mat4 ty = mat4 (0.0, 0.0, 0.0, 0.0,
-                      0.0, 0.0, 0.0, 0.0,
-                      0.0, 0.0, 0.0, 0.0,
-                      0.0, 0.0, 0.0, 0.0);
-      mat4 tz = mat4 (0.0, 0.0, 0.0, 0.0,
-                      0.0, 0.0, 0.0, 0.0,
-                      0.0, 0.0, 0.0, 0.0,
-                      0.0, 0.0, 0.0, 0.0);
+      mat4 txyz = mat4 (1.0, 0.0, 0.0, t[0],
+                        0.0, 1.0, 0.0, t[1],
+                        0.0, 0.0, 1.0, t[2],
+                        0.0, 0.0, 0.0, 1.0);
 
-      gl_Position = rz * ry * rx * aVertexPosition;
+      gl_Position = txyz * rz * ry * rx * aVertexPosition;
       vbc = bary;
     }
     </script>
@@ -86,60 +80,73 @@
 
       let angleIndex = 0;
       let angleIncVal = 0;
+      let translationIndex = 0;
+      let translationIncVal = 0;
       switch (key){
         // Increment rotation
         case 'i':
           angleIndex = 0;
-          angleIncVal = -angleInc;
+          angleIncVal = angleInc;
           break;
         case 'k':
           angleIndex = 0;
-          angleIncVal = angleInc;
+          angleIncVal = -angleInc;
           break;
         case 'j':
           angleIndex = 1;
-          angleIncVal = -angleInc;
+          angleIncVal = angleInc;
           break;
         case 'l':
           angleIndex = 1;
-          angleIncVal = angleInc;
+          angleIncVal = -angleInc;
           break;
         case 'u':
           angleIndex = 2;
-          angleIncVal = -angleInc;
+          angleIncVal = angleInc;
           break;
         case 'o':
           angleIndex = 2;
-          angleIncVal = angleInc;
+          angleIncVal = -angleInc;
           break;
         // Increment position
         case 'a':
           //todo add camera movement
+          translationIndex = 0;
+          translationIncVal = translationInc;
           break;
         case 'd':
           //todo add camera movement
+          translationIndex = 0;
+          translationIncVal = translationInc;
           break;
         case 'w':
           //todo add camera movement
+          translationIndex = 0;
+          translationIncVal = translationInc;
           break;
         case 's':
           //todo add camera movement
+          translationIndex = 0;
+          translationIncVal = translationInc;
           break;
         case 'q':
           //todo add camera movement
+          translationIndex = 0;
+          translationIncVal = translationInc;
           break;
         case 'e':
           //todo add camera movement
+          translationIndex = 0;
+          translationIncVal = translationInc;
           break;
         // Reset position and angle
         case 'r':
-          angles[0] = anglesReset[0];
-          angles[1] = anglesReset[1];
-          angles[2] = anglesReset[2];
-          //todo position reset
+          angles = anglesReset;
+          translations = translationsReset;
           break;
       }
       angles[angleIndex] += angleIncVal;
+      translations[translationIndex] += translationIncVal;
         
       // Create a new shape and do a redo a draw
       createNewShape();
