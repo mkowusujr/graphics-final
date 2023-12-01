@@ -35,6 +35,17 @@
                       0.0,  0.0,  1.0,  0.0,
                       0.0,  0.0,  0.0,  1.0);
 
+      // TODO add translations matrices for camera movement
+      mat4 tx = mat4 (0.0, 0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0, 0.0);
+      mat4 ty = mat4 (0.0, 0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0, 0.0);
+      mat4 tz = mat4 (0.0, 0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0, 0.0);
+
       gl_Position = rz * ry * rx * aVertexPosition;
       vbc = bary;
     }
