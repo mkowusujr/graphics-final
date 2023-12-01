@@ -1,51 +1,51 @@
 <html>
-<head>
-  <title>Island</title>
-  <link rel="stylesheet" href="tess.css">
-  <!-- vertex Shader -->
-  <script id="vertex-shader" type="x-shader/x-vertex">
-    #version 300 es
-    in vec4 aVertexPosition;
-    in vec3 bary;
-    uniform vec3 theta;
-    uniform vec3 translation; 
-    
-    out vec3 vbc;
+  <head>
+    <title>Island</title>
+    <link rel="stylesheet" href="tess.css">
+    <!-- vertex Shader -->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+      #version 300 es
+      in vec4 aVertexPosition;
+      in vec3 bary;
+      uniform vec3 theta;
+      uniform vec3 translation; 
+      
+      out vec3 vbc;
 
-    void main()
-    {
-      // Compute the sines and cosines of each rotation
-      // about each axis
-      vec3 angles = radians(theta);
-      vec3 c = cos(angles);
-      vec3 s = sin(angles);
-      vec3 tsc = translation;
+      void main()
+      {
+        // Compute the sines and cosines of each rotation
+        // about each axis
+        vec3 angles = radians(theta);
+        vec3 c = cos(angles);
+        vec3 s = sin(angles);
+        vec3 tsc = translation;
 
-      // rotation matrices
-      mat4 rx = mat4 (1.0,  0.0,  0.0,  0.0,
-                      0.0,  c.x,  s.x,  0.0,
-                      0.0, -s.x,  c.x,  0.0,
-                      0.0,  0.0,  0.0,  1.0);
+        // rotation matrices
+        mat4 rx = mat4 (1.0,  0.0,  0.0,  0.0,
+                        0.0,  c.x,  s.x,  0.0,
+                        0.0, -s.x,  c.x,  0.0,
+                        0.0,  0.0,  0.0,  1.0);
 
-      mat4 ry = mat4 (c.y,  0.0, -s.y,  0.0,
-                      0.0,  1.0,  0.0,  0.0,
-                      s.y,  0.0,  c.y,  0.0,
-                      0.0,  0.0,  0.0,  1.0);
+        mat4 ry = mat4 (c.y,  0.0, -s.y,  0.0,
+                        0.0,  1.0,  0.0,  0.0,
+                        s.y,  0.0,  c.y,  0.0,
+                        0.0,  0.0,  0.0,  1.0);
 
-      mat4 rz = mat4 (c.z,  s.z,  0.0,  0.0,
-                      -s.z,  c.z,  0.0,  0.0,
-                      0.0,  0.0,  1.0,  0.0,
-                      0.0,  0.0,  0.0,  1.0);
+        mat4 rz = mat4 (c.z,  s.z,  0.0,  0.0,
+                        -s.z,  c.z,  0.0,  0.0,
+                        0.0,  0.0,  1.0,  0.0,
+                        0.0,  0.0,  0.0,  1.0);
 
-      // TODO add translations matrices for camera movement
-      mat4 tscxyz = mat4 (tsc[2], 0.0, 0.0, tsc[0],
-                        0.0, tsc[2], 0.0, tsc[1],
-                        0.0, 0.0, tsc[2], 0.0/*tsc[2]*/,//TODO tsc[2]
-                        0.0, 0.0, 0.0, 1.0);
-      gl_Position = rz * ry * rx * aVertexPosition * tscxyz;
-      vbc = bary;
-    }
+        mat4 tscxyz = mat4 (tsc[2], 0.0, 0.0, tsc[0],
+                          0.0, tsc[2], 0.0, tsc[1],
+                          0.0, 0.0, tsc[2], 0.0/*tsc[2]*/,//TODO tsc[2]
+                          0.0, 0.0, 0.0, 1.0);
+        gl_Position = rz * ry * rx * aVertexPosition * tscxyz;
+        vbc = bary;
+      }
     </script>
+
     <!-- fragment Shader -->
     <script id="fragment-shader" type="x-shader/x-fragment">
       #version 300 es
@@ -64,122 +64,117 @@
         }
       }
     </script>
-     
-     <!-- include the shape creation functions -->
+      
+      <!-- include the shape creation functions -->
     <script type="text/javascript" src="./cgIShape.js"></script>
     
     <!-- include the main tesselation functions -->
     <script type="text/javascript" src="./tessMain.js"></script>
-    
+      
     <!-- keyboard functions -->
     <script type="text/javascript">
-    
-    function gotKey (event) {
-      var key = event.key;
+      function gotKey (event) {
+        var key = event.key;
 
-      let angleIndex = 0;
-      let angleIncVal = 0;
-      let translationIndex = 0;
-      let translationIncVal = 0;
-      switch (key){
-        // Increment rotation
-        case 'i':
-          angleIndex = 0;
-          angleIncVal = angleInc;
-          break;
-        case 'k':
-          angleIndex = 0;
-          angleIncVal = -angleInc;
-          break;
-        case 'j':
-          angleIndex = 1;
-          angleIncVal = angleInc;
-          break;
-        case 'l':
-          angleIndex = 1;
-          angleIncVal = -angleInc;
-          break;
-        case 'u':
-          angleIndex = 2;
-          angleIncVal = angleInc;
-          break;
-        case 'o':
-          angleIndex = 2;
-          angleIncVal = -angleInc;
-          break;
-        // Increment position
-        case 'a':
-          //todo add camera movement
-          translationIndex = 0;
-          translationIncVal = -translationInc;
-          break;
-        case 'd':
-          translationIndex = 0;
-          translationIncVal = translationInc;
-          break;
-        case 'w':
-          translationIndex = 1;
-          translationIncVal = translationInc;
-          break;
-        case 's':
-          translationIndex = 1;
-          translationIncVal = -translationInc;
-          break;
-        case 'q':
-          translationIndex = 2;
-          translationIncVal = translationInc;
-          break;
-        case 'e':
-          translationIndex = 2;
-          translationIncVal = -translationInc;
-          break;
-        // Reset position and angle
-        case 'r':
-        case 'R':
-          angles = [...anglesReset];
-          translations = [...translationsReset];
-          break;
+        let angleIndex = 0;
+        let angleIncVal = 0;
+        let translationIndex = 0;
+        let translationIncVal = 0;
+        switch (key){
+          // Increment rotation
+          case 'i':
+            angleIndex = 0;
+            angleIncVal = angleInc;
+            break;
+          case 'k':
+            angleIndex = 0;
+            angleIncVal = -angleInc;
+            break;
+          case 'j':
+            angleIndex = 1;
+            angleIncVal = angleInc;
+            break;
+          case 'l':
+            angleIndex = 1;
+            angleIncVal = -angleInc;
+            break;
+          case 'u':
+            angleIndex = 2;
+            angleIncVal = angleInc;
+            break;
+          case 'o':
+            angleIndex = 2;
+            angleIncVal = -angleInc;
+            break;
+          // Increment position
+          case 'a':
+            translationIndex = 0;
+            translationIncVal = -translationInc;
+            break;
+          case 'd':
+            translationIndex = 0;
+            translationIncVal = translationInc;
+            break;
+          case 'w':
+            translationIndex = 1;
+            translationIncVal = translationInc;
+            break;
+          case 's':
+            translationIndex = 1;
+            translationIncVal = -translationInc;
+            break;
+          case 'q':
+            translationIndex = 2;
+            translationIncVal = translationInc;
+            break;
+          case 'e':
+            translationIndex = 2;
+            translationIncVal = -translationInc;
+            break;
+          // Reset position and angle
+          case 'r':
+          case 'R':
+            angles = [...anglesReset];
+            translations = [...translationsReset];
+            break;
+        }
+        console.log(translations[2]); //TODO remove this print
+        angles[angleIndex] += angleIncVal;
+        translations[translationIndex] += translationIncVal;
+        if (translations[2] < translationInc){
+            translations[2] = translationInc;
+        }
+          
+        // Create a new shape and do a redo a draw
+        createNewShape();
+        draw();
       }
-      console.log(translations[2]); //TODO remove this print
-      angles[angleIndex] += angleIncVal;
-      translations[translationIndex] += translationIncVal;
-      if (translations[2] < translationInc){
-          translations[2] = translationInc;
-      }
-        
-      // Create a new shape and do a redo a draw
-      createNewShape();
-      draw();
-    }
-    
     </script>
+    <script type="text/javascript">
+      // Call init once the webpage has loaded
+      window.onload = init;
+    </script>
+  </head>
 
-  <script type="text/javascript">
-    // Call init once the webpage has loaded
-    window.onload = init;
-  </script>
-</head>
-
-<body>
-  <canvas id="webgl-canvas">
-    Your browser does not support the HTML5 canvas element.
-  </canvas>    
-  <table border="1">
-    <tbody>
-      <tr>
-        <td>j,k,i,l,u,o</td>
-        <td>Rotate cam rev</td>
-      </tr>
-      <tr>
-        <td>r,R</td>
-        <td>Reset pos & rot</td>
-      </tr>
-      <tr>
-        <td>a,s,w,d,q,e</td>
-        <td>Move cam</td>
-      </tr>
-    </tbody>
-  </table>
-</body>
+  <body>
+    <canvas id="webgl-canvas">
+      Your browser does not support the HTML5 canvas element.
+    </canvas>    
+    <table border="1">
+      <tbody>
+        <tr>
+          <td>j,k,i,l,u,o</td>
+          <td>Rotate cam rev</td>
+        </tr>
+        <tr>
+          <td>r,R</td>
+          <td>Reset pos & rot</td>
+        </tr>
+        <tr>
+          <td>a,s,w,d,q,e</td>
+          <td>Move cam</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
 </html>
-
