@@ -43,7 +43,7 @@
                         0.0, 0.0, 1.0, t[2],
                         0.0, 0.0, 0.0, 1.0);
 
-      gl_Position = txyz * rz * ry * rx * aVertexPosition;
+      gl_Position = rz * ry * rx * aVertexPosition * txyz;
       vbc = bary;
     }
     </script>
