@@ -231,36 +231,56 @@ function makeHemisphere(slices, stacks, origin, dim) { //TODO look deeper at how
     stacks = stacks < 4 ? 4 : stacks % 2 == 1 ? stacks++ : stacks;
     // const dim = 1;
     const r =  0.5; // TODO remove
+    // const latStep = (origin.y + r) / stacks//pi / (stacks * 2);
     const latStep = pi / (stacks * 2);
     const lonStep = (2 * pi) / slices;
 
-    for (let i = 0; i <= stacks; i++) {
+    for (let i = 0; i <= stacks; i++) { // up and down
         var lat0 = i * latStep;
         var lat1 = lat0 + latStep;
 
-        for (let j = 0; j < slices; j++) {
+        for (let j = 0; j < slices; j++) { // left and right
             var lon0 = j * lonStep;
             var lon1 = lon0 + lonStep;
 
             let coords = HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim);
 
             if (i == 0) {
-                // Draw Top
-                let triangle = Triangle.create([coords.x3, coords.y3, coords.z1, coords.x2, coords.y2, coords.z1, origin.x, origin.y, origin.z + r* dim.z]);
+                // // Draw Bottom
+                let triangle = Triangle.create(
+                    [
+                        coords.x2, coords.y1, coords.z2,
+                        origin.x, origin.y - r, origin.z,
+                        coords.x3, coords.y1, coords.z3
+                    ]
+                );
 
                 triangle.draw();
             } else if (i == stacks) {
-                // Draw Base
-                let triangle = Triangle.create([coords.x0, coords.y0, coords.z0, coords.x1, coords.y1, coords.z0, origin.x, origin.y, origin.z
-                ]);
+                // Draw Base (Top)
+                let triangle = Triangle.create(
+                    [
+                        coords.x1, coords.y0, coords.z1,
+                        origin.x, origin.y, origin.z,
+                        coords.x0, coords.y0, coords.z0,
+                    ]
+                );
 
                 triangle.draw();
             } else {
                 // Draw Sides
-                let triangle0 = Triangle.create([coords.x1, coords.y1, coords.z0, coords.x3, coords.y3, coords.z1, coords.x0, coords.y0, coords.z0
+                let triangle0 = Triangle.create(
+                    [
+                        coords.x1, coords.y0, coords.z1,
+                        coords.x3, coords.y1, coords.z3,
+                        coords.x0, coords.y0, coords.z0
                 ]);
 
-                let triangle1 = Triangle.create([coords.x2, coords.y2, coords.z1, coords.x0, coords.y0, coords.z0, coords.x3, coords.y3, coords.z1
+                let triangle1 = Triangle.create(
+                    [
+                        coords.x2, coords.y1, coords.z2,
+                        coords.x0, coords.y0, coords.z0,
+                        coords.x3, coords.y1, coords.z3
                 ]);
 
                 triangle0.draw();
@@ -276,30 +296,31 @@ function makeHemisphere(slices, stacks, origin, dim) { //TODO look deeper at how
  * @param {*} lat1 Next lat
  * @param {*} lon0 Current lon
  * @param {*} lon1 Next lon
- * @param {*} r Objects radius
+ * @param {*} r Object's radius
  * @param {*} origin Point object of the hemisphere's origin point
- * @returns All 10 coordinates
+ * @returns Map of 10 coordinates
  */
 function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim) {
-    const rsinlat0 = r * sin(lat0)
-    const rsinlat1 = r * sin(lat1) 
+    const rsinlat0 = r * sin(lat0);
+    const rsinlat1 = r * sin(lat1);
 
-    const sinlon0 = sin(lon0) * dim.y
-    const sinlon1 = sin(lon1) * dim.y
+    const sinlon0 = sin(lon0) * dim.z;
+    const sinlon1 = sin(lon1) * dim.z;
 
-    const coslon0 = cos(lon0) * dim.x
-    const coslon1 = cos(lon1) * dim.x
+    const coslon0 = cos(lon0) * dim.x;
+    const coslon1 = cos(lon1) * dim.x;
+
     return {
         x0: origin.x + rsinlat0 * coslon0,
-        y0: origin.y + rsinlat0 * sinlon0,
-        z0: origin.z + r * cos(lat0) * dim.z,
+        z0: origin.z + rsinlat0 * sinlon0,
+        y0: origin.y - r * cos(lat0) * dim.y,
         x1: origin.x + rsinlat0 * coslon1,
-        y1: origin.y + rsinlat0 * sinlon1,
-        z1: origin.z + r * cos(lat1) * dim.z,
+        z1: origin.z + rsinlat0 * sinlon1,
+        y1: origin.y - r * cos(lat1) * dim.y,
         x2: origin.x + rsinlat1 * coslon0,
-        y2: origin.y + rsinlat1 * sinlon0,
+        z2: origin.z + rsinlat1 * sinlon0,
         x3: origin.x + rsinlat1 * coslon1,
-        y3: origin.y + rsinlat1 * sinlon1,
+        z3: origin.z + rsinlat1 * sinlon1,
     };
 }
 

@@ -20,7 +20,7 @@
   var division2 = 10;
   var updateDisplay = true;
 
-  var anglesReset = [60.0, 0.0, 0.0];
+  var anglesReset = [0.0, 0.0, 0.0];
   var angles = [...anglesReset];
   var angleInc = 5.0;
 
@@ -93,13 +93,21 @@
   }
 
 function createScene() {
-  let dimForTrunk = { x: .5, y: 2, z: 1 }
+  /*let dimForTrunk = { x: .5, y: 2, z: 1 }
   let originForTrunk = Point.create([0, 0, -dimForTrunk.z / 2])
-  makeCylinder(division1, division2, originForTrunk, dimForTrunk);
+  makeCylinder(division1, division2, originForTrunk, dimForTrunk);*/
   
     let originForGround = Point.create([0, 0, 0])
     let dimForGround = { x: 1, y: 1, z: 2 }
   makeHemisphere(division1, division2, originForGround, dimForGround);
+
+  Triangle.create(
+    [
+      0.0,0.0, 0.0, // y
+      1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0 // towards us
+    ]).draw()
+ 
   }
 
   // general call to make and bind a new object based on current
