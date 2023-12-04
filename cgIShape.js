@@ -135,10 +135,10 @@ function makeCylinder(radialdivision, heightdivision, origin, dim) {
     for(let i = 0; i < radialdivision; i++){
         const theta0 = i * beta;
         const theta1 = theta0 + beta;
-        const x0 = r * Math.cos(theta0);
-        const z0 = r * Math.sin(theta0);
-        const x1 = r * Math.cos(theta1);
-        const z1 = r * Math.sin(theta1);
+        const x0 = r * sin(theta0);
+        const z0 = r * cos(theta0);
+        const x1 = r * sin(theta1);
+        const z1 = r * cos(theta1);
 
         for (let u = 0; u < heightdivision; u++){
             let y0 = -r + u * t;
@@ -247,12 +247,10 @@ function makeCone(radialdivision, heightdivision, origin) {
  * @param {*} stacks Horizontal slices
  * @param {*} origin Point object of the hemisphere's origin point
  */
-function makeHemisphere(slices, stacks, origin, dim) { //TODO look deeper at how origin point is affecting moving the object
+function makeHemisphere(slices, stacks, origin, dim) {
     slices = slices < 3 ? 3 : slices;
     stacks = stacks < 4 ? 4 : stacks % 2 == 1 ? stacks++ : stacks;
-    // const dim = 1;
-    const r =  0.5; // TODO remove
-    // const latStep = (origin.y + r) / stacks//pi / (stacks * 2);
+    const r =  0.5; 
     const latStep = pi / (stacks * 2);
     const lonStep = (2 * pi) / slices;
 
@@ -346,6 +344,5 @@ function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim) {
 }
 
 function radians(degrees) {
-    var pi = Math.PI;
     return degrees * (pi / 180);
 }
