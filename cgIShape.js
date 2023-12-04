@@ -136,26 +136,47 @@ function makeCylinder(radialdivision, heightdivision, origin, dim) {
         const theta0 = i * beta;
         const theta1 = theta0 + beta;
         const x0 = r * Math.cos(theta0);
-        const y0 = r * Math.sin(theta0);
+        const z0 = r * Math.sin(theta0);
         const x1 = r * Math.cos(theta1);
-        const y1 = r * Math.sin(theta1);
+        const z1 = r * Math.sin(theta1);
 
         for (let u = 0; u < heightdivision; u++){
-            let z0 = -r + u * t;
-            let z1 = z0 + t;
+            let y0 = -r + u * t;
+            let y1 = y0 + t;
 
-            let triange1 = Triangle.create([origin.x + x0, origin.y + y0, origin.z + z0, origin.x + x0, origin.y + y0, origin.z + z1, origin.x + x1, origin.y + y1, origin.z + z0])
-            let triange2 = Triangle.create([origin.x + x1, origin.y + y1, origin.z + z1, origin.x + x1, origin.y + y1, origin.z + z0, origin.x + x0, origin.y + y0, origin.z + z1])
+            let triange1 = Triangle.create(
+                [
+                    origin.x + x0, origin.y + y0, origin.z + z0,
+                    origin.x + x0, origin.y + y1, origin.z + z0,
+                    origin.x + x1, origin.y + y0, origin.z + z1
+                ])
+            let triange2 = Triangle.create(
+                [
+                    origin.x + x1, origin.y + y1, origin.z + z1,
+                    origin.x + x1, origin.y + y0, origin.z + z1,
+                    origin.x + x0, origin.y + y1, origin.z + z0])
 
             triange1.draw()
             triange2.draw()
         }
 
-        // Draw Top Face
-        Triangle.create([origin.x + x1, origin.y + y1, origin.z -r, origin.x, origin.y, origin.z -r, origin.x + x0, origin.y + y0, origin.z -r]).draw()
+        // // Draw Top Face
+        Triangle.create(
+            [
+                origin.x + x1, origin.y - r, origin.z + z1,
+                origin.x, origin.y - r, origin.z,
+                origin.x + x0, origin.y - r, origin.z + z0
+            ]
+        ).draw()
 
-        // Draw Bottom Face
-        Triangle.create([origin.x + x1, origin.y + y1, origin.z + r, origin.x + x0, origin.y + y0, origin.z + r, origin.x, origin.y, origin.z + r]).draw()
+        // // Draw Bottom Face
+        Triangle.create(
+            [
+                origin.x + x1, origin.y + r, origin.z + z1,
+                origin.x + x0, origin.y + r, origin.z + z0,
+                origin.x, origin.y + r, origin.z
+            ]
+        ).draw()
     }
 }
 

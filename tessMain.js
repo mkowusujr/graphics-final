@@ -93,20 +93,21 @@
   }
 
 function createScene() {
-  /*let dimForTrunk = { x: .5, y: 2, z: 1 }
-  let originForTrunk = Point.create([0, 0, -dimForTrunk.z / 2])
-  makeCylinder(division1, division2, originForTrunk, dimForTrunk);*/
+  let dimForTrunk = { x: .5, y: 2, z: 1 }
+  let originForTrunk = Point.create([0, 0, 0])
+  makeCylinder(division1, division2, originForTrunk, dimForTrunk);
   
     let originForGround = Point.create([0, 0, 0])
-    let dimForGround = { x: 1, y: 1, z: 2 }
+    let dimForGround = { x: 1, y: 1, z: 1 }
   makeHemisphere(division1, division2, originForGround, dimForGround);
 
-  Triangle.create(
-    [
-      0.0,0.0, 0.0, // y
-      1.0, 0.0, 0.0,
-    0.0, 0.0, 1.0 // towards us
-    ]).draw()
+  // Test triangle
+  // Triangle.create(
+  //   [
+  //     0.0,0.0, 0.0, // y
+  //     1.0, 0.0, 0.0,
+  //   0.0, 0.0, 1.0 // towards us
+  //   ]).draw()
  
   }
 
