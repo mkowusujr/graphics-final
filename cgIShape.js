@@ -2,11 +2,6 @@
 const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);
 let cos = (theta) => Math.cos(theta);
-let normalizeX = (x) => x//(x / canvas.width) * 2 - 1,
-normalizeY = (y) => y//1 - (y / canvas.height) * 2, // Invert y to match the canvas coordinate system
-normalizeZ = (z) => z//(z / canvas.height) * 2 - 1;
-
-
 
 class Triangle {
     constructor(point0, point1, point2) {
@@ -55,9 +50,9 @@ class Triangle {
 
 class Point {
     constructor(x, y, z) {
-        this.x = normalizeX(x);
-        this.y = normalizeY(y);
-        this.z = normalizeZ(z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
     static create(x, y, z) {
         return new new Point(x, y, z)();
