@@ -129,54 +129,54 @@ function makeCube(subdivisions, origin, dim) {
 function makeCylinder(radialdivision, heightdivision, origin, dim) {
     heightdivision = heightdivision < 1 ? 1 : heightdivision;
     radialdivision = radialdivision < 3 ? 3 : radialdivision;
-    const r = 0.5;
+    const r = { x: dim.x/2, y: dim.y/2, z: dim.z/2 };
     const t = 1 / heightdivision;
     const beta = 2 * pi / radialdivision;
-    for(let i = 0; i < radialdivision; i++){
+    for (let i = 0; i < radialdivision; i++) {
         const theta0 = i * beta;
         const theta1 = theta0 + beta;
-        const x0 = r * sin(theta0);
-        const z0 = r * cos(theta0);
-        const x1 = r * sin(theta1);
-        const z1 = r * cos(theta1);
+        const x0 = origin.x + r.x * sin(theta0);
+        const z0 = origin.z + r.z * cos(theta0);
+        const x1 = origin.x + r.x * sin(theta1);
+        const z1 = origin.z + r.z * cos(theta1);
 
-        for (let u = 0; u < heightdivision; u++){
-            let y0 = -r + u * t;
+        for (let u = 0; u < heightdivision; u++) {
+            let y0 = origin.y + - r.y + u * t;
             let y1 = y0 + t;
 
             let triange1 = Triangle.create(
                 [
-                    origin.x + x0, origin.y + y0, origin.z + z0,
-                    origin.x + x0, origin.y + y1, origin.z + z0,
-                    origin.x + x1, origin.y + y0, origin.z + z1
-                ])
+                    x0, y0, z0,
+                    x0, y1, z0,
+                    x1, y0, z1
+                ]);
             let triange2 = Triangle.create(
                 [
-                    origin.x + x1, origin.y + y1, origin.z + z1,
-                    origin.x + x1, origin.y + y0, origin.z + z1,
-                    origin.x + x0, origin.y + y1, origin.z + z0])
+                    x1, y1, z1,
+                    x1, y0, z1,
+                    x0, y1, z0]);
 
-            triange1.draw()
-            triange2.draw()
+            triange1.draw();
+            triange2.draw();
         }
 
         // // Draw Top Face
         Triangle.create(
             [
-                origin.x + x1, origin.y - r, origin.z + z1,
-                origin.x, origin.y - r, origin.z,
-                origin.x + x0, origin.y - r, origin.z + z0
+                x1, origin.y - r.y, z1,
+                origin.x, origin.y - r.y , origin.z,
+                x0, origin.y - r.y, z0
             ]
-        ).draw()
+        ).draw();
 
         // // Draw Bottom Face
         Triangle.create(
             [
-                origin.x + x1, origin.y + r, origin.z + z1,
-                origin.x + x0, origin.y + r, origin.z + z0,
-                origin.x, origin.y + r, origin.z
+                x1, origin.y + r.y, z1,
+                x0, origin.y + r.y, z0,
+                origin.x, origin.y + r.y, origin.z
             ]
-        ).draw()
+        ).draw();
     }
 }
 
@@ -250,7 +250,7 @@ function makeCone(radialdivision, heightdivision, origin) {
 function makeHemisphere(slices, stacks, origin, dim) {
     slices = slices < 3 ? 3 : slices;
     stacks = stacks < 4 ? 4 : stacks % 2 == 1 ? stacks++ : stacks;
-    const r =  0.5; 
+    const r = 1;
     const latStep = pi / (stacks * 2);
     const lonStep = (2 * pi) / slices;
 
@@ -293,14 +293,14 @@ function makeHemisphere(slices, stacks, origin, dim) {
                         coords.x1, coords.y0, coords.z1,
                         coords.x3, coords.y1, coords.z3,
                         coords.x0, coords.y0, coords.z0
-                ]);
+                    ]);
 
                 let triangle1 = Triangle.create(
                     [
                         coords.x2, coords.y1, coords.z2,
                         coords.x0, coords.y0, coords.z0,
                         coords.x3, coords.y1, coords.z3
-                ]);
+                    ]);
 
                 triangle0.draw();
                 triangle1.draw();
