@@ -1,7 +1,7 @@
-//todo remove once all shape code is updated to use a given origin
 const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);
 let cos = (theta) => Math.cos(theta);
+const LimbTypes = Object.freeze({Root: Symbol(-1), Branch: Symbol(1)});
 
 class Triangle {
     constructor(point0, point1, point2) {
@@ -55,7 +55,7 @@ class Point {
         this.z = z;
     }
     static create(x, y, z) {
-        return new new Point(x, y, z)();
+        return new new Point(x, y, z)(); //TODO ask Mat about the "new new" here
     }
     static create(coords) {
         return new Point(coords[0], coords[1], coords[2]);
@@ -340,4 +340,54 @@ function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim) {
 
 function radians(degrees) {
     return degrees * (pi / 180);
+}
+
+/**
+ * Create the branches/roots
+ * @param {*} triangles Array of triangles to make branches from
+ * @param {*} limbType Enum of branch or root
+ */
+function makeLimbs(triangles, limbType){
+    for (var i = 0; i < triangles.length; i++){
+        makeLimb(triangles[i], limbType);
+    }
+}
+
+function makeLimb(triangle, limbType){
+    const sides = 3;
+    // 1 or 2
+    const numSegments = Math.round(Math.random() + 1);
+    // Draw segments
+    for (let i = 0; i <= numSegments; i++){
+        const xShift = Math.random(); //TODO tweak all of these to give good results
+        const yShift = Math.random(); //TODO Make it tend downwards if root, up if branch
+        const zShift = Math.random();
+
+        const points = [];
+        //TODO this could go in the if i != num if stmt
+        //TODO ask Mat how to do the point0/1/2 part in a loop
+        //Loop 0 should be traingle.point0.x ...
+        //Loop 1 should be traingle.point1.x ...
+        for (let j = 0; j < sides; j++){
+            const pointCoords = [triangle.point0.x + xShift, triangle.point0.y + yShift, triangle.point0.z + zShift];
+            points[i] = Point.create(pointCoords);
+        }
+
+        for(let j = 0; j < sides; j++){
+            if (i != numSegments){
+                // Draw sides
+                //TODO draw 2 triangles to make squares
+                // Triangle.create().draw();
+                // Triangle.create().draw();
+            }
+            else{
+                // Draw tip
+                //TODO find the mid point of the triangle, then shift that point
+                // Triangle.create().draw();
+            }
+        }
+        if(i != numSegments){
+            triangle = Triangle.create(points); //TODO remember to not draw this triangle
+        }
+    }
 }
