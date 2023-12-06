@@ -1,8 +1,17 @@
 "use strict";
+import { makeCylinder, makeHemisphere, makeLimbs, trianglesForBranches, trianglesForRoots } from "./utils/shapes.js";
+import { Point } from "./models/point.js";
+import { fragmentshader } from "./shaders/fragmentshader.gsls.js";
+import { vertexshader } from "./shaders/vertexshader.gsls.js";
+import { getAngles, getTranslations, gotKey } from "./utils/controls.js";
+import { LimbTypes } from "./models/limbtypes.js";
 
 // Global variables that are set and used
 // across the application
 let gl, program, points, bary, indices, canvas;
+export const getPointsArr = () => points;
+export const getBaryArr = () => bary;
+export const getIndices = () => indices;
 
 // VAO stuff
 var myVAO = null;
@@ -15,27 +24,12 @@ var division1 = 25;
 var division2 = 10;
 var updateDisplay = true;
 
-var anglesReset = [270.0, 0.0, 0.0];
-var angles = [...anglesReset];
-var angleInc = 5.0;
-
-var translationsReset = [0.0, 0.0, 0.25];
-var translations = [...translationsReset];
-var translationInc = 0.05;
-const translationMinZ = 0;
-
-// Shapes we v draw
-var CUBE = 1;
-var CYLINDER = 2;
-var CONE = 3;
-var HEMISPHERE = 4;
-
 // Setting up where the objects are displayed
 const genRandValue = (min, max) => Math.random() * (max - min) + min;
 
-let dimForGround = { x: 1, y: 1, z: 1 };
+let dimForGround = { x: 1,y: 1, z: 1 };
 let originForGround = Point.create([0, 0, 0]);
-let dimForTrunk = { x: 1, y: 1, z: 1 };
+let dimForTrunk = { x: 1, y: 1, z: 1};
 
 let minX = -(originForGround.x + dimForGround.x - dimForTrunk.x / 1.5),
     maxX = originForGround.x + dimForGround.x - dimForTrunk.x / 1.5;
@@ -53,15 +47,15 @@ let originForTrunk = Point.create([
 
 // Given an id, extract the content's of a shader script
 // from the DOM and return the compiled shader
-function getShader(id) {
-    const script = document.getElementById(id);
-    const shaderString = script.text.trim();
+function getShader(shadertype, shaderString) {
+    // const script = document.getElementById(id);
+    // const shaderString = script.text.trim();
 
     // Assign shader depending on the type of shader
     let shader;
-    if (script.type === "x-shader/x-vertex") {
+    if (shadertype === "vertex-shader") {
         shader = gl.createShader(gl.VERTEX_SHADER);
-    } else if (script.type === "x-shader/x-fragment") {
+    } else if (shadertype === "fragment-shader") {
         shader = gl.createShader(gl.FRAGMENT_SHADER);
     } else {
         return null;
@@ -82,8 +76,8 @@ function getShader(id) {
 
 // Create a program with the appropriate vertex and fragment shaders
 function initProgram() {
-    const vertexShader = getShader("vertex-shader");
-    const fragmentShader = getShader("fragment-shader");
+    const vertexShader = getShader("vertex-shader", vertexshader);
+    const fragmentShader = getShader("fragment-shader", fragmentshader);
 
     // Create a program
     program = gl.createProgram();
@@ -107,8 +101,12 @@ function initProgram() {
 }
 
 function createScene() {
+    // bool flag to determine when to draw branches/roots
     makeHemisphere(division1, division2, originForGround, dimForGround);
     makeCylinder(division1, division2, originForTrunk, dimForTrunk);
+
+    // makeLimbs(trianglesForBranches, LimbTypes.Branch);
+    // makeLimbs(trianglesForRoots, LimbTypes.Root);
 
     // Test triangle
     // Triangle.create(
@@ -121,7 +119,7 @@ function createScene() {
 
 // general call to make and bind a new object based on current
 // settings..Basically a call to shape specfic calls in cgIshape.js
-function createNewShape() {
+export function createNewShape() {
     // clear your points and elements
     points = [];
     indices = [];
@@ -148,8 +146,8 @@ function createNewShape() {
     gl.vertexAttribPointer(program.aBary, 3, gl.FLOAT, false, 0, 0);
 
     // uniform values
-    gl.uniform3fv(program.uTheta, new Float32Array(angles));
-    gl.uniform3fv(program.uTranslation, new Float32Array(translations));
+    gl.uniform3fv(program.uTheta, new Float32Array(getAngles()));
+    gl.uniform3fv(program.uTranslation, new Float32Array(getTranslations()));
 
     // Setting up the IBO
     if (myIndexBuffer == null) myIndexBuffer = gl.createBuffer();
@@ -170,7 +168,7 @@ function createNewShape() {
 }
 
 // We call draw to render to our canvas
-function draw() {
+export function draw() {
     // Clear the scene
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -228,3 +226,5 @@ function init() {
     // do a draw
     draw();
 }
+
+init();
