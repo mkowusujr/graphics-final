@@ -360,25 +360,23 @@ function makeLimb(triangle, limbType){
     // Draw segments
     for (let i = 0; i <= numSegments; i++){
         const xShift = Math.random(); //TODO tweak all of these to give good results
-        const yShift = Math.random(); //TODO Make it tend downwards if root, up if branch
+        const yShift = limbType * Math.random(); //TODO Make it tend downwards if root, up if branch (I think I did this)
         const zShift = Math.random();
 
         const points = [];
-        //TODO this could go in the if i != num if stmt
-        //TODO ask Mat how to do the point0/1/2 part in a loop
-        //Loop 0 should be traingle.point0.x ...
-        //Loop 1 should be traingle.point1.x ...
+        const tpoints = [triangle.point0, triangle.point1, triangle.point1];
         for (let j = 0; j < sides; j++){
-            const pointCoords = [triangle.point0.x + xShift, triangle.point0.y + yShift, triangle.point0.z + zShift];
-            points[i] = Point.create(pointCoords);
+            const pointCoords = [tpoints[j].x + xShift, tpoints[j].y + yShift, tpoints[j].z + zShift];
+            points[j] = Point.create(pointCoords);
         }
 
         for(let j = 0; j < sides; j++){
+            let k = tpoints.length - 1;
             if (i != numSegments){
                 // Draw sides
-                //TODO draw 2 triangles to make squares
-                // Triangle.create().draw();
-                // Triangle.create().draw();
+                Triangle.create(tpoints[j], points[j], tpoints[k]).draw();
+                Triangle.create(points[k], tpoints[k], points[i]).draw();
+                k = j - 1;
             }
             else{
                 // Draw tip
