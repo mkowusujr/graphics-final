@@ -77,7 +77,7 @@ export function gotKey(event) {
 			translations = [...translationsReset];
 			break;
 	}
-	console.log(translations[2]); //TODO remove this print
+	// console.log(translations[2]); //TODO remove this print
 	angles[angleIndex] += angleIncVal;
 	translations[translationIndex] += translationIncVal;
 	if (translations[2] < translationInc) {

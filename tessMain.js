@@ -5,6 +5,7 @@ import { fragmentshader } from "./shaders/fragmentshader.gsls.js";
 import { vertexshader } from "./shaders/vertexshader.gsls.js";
 import { getAngles, getTranslations, gotKey } from "./utils/controls.js";
 import { LimbTypes } from "./models/limbtypes.js";
+import { Triangle } from "./models/triangle.js"; //todo remove
 
 // Global variables that are set and used
 // across the application
@@ -44,6 +45,23 @@ let originForTrunk = Point.create([
     originForGround.y + dimForTrunk.y / 2,
     originForGround.z + randZ,
 ]);
+
+const cylinderNumTriangles = 0; //todo
+const hemisphereNumTriangles = (division2 - 1) * division1 * 2 + division1
+const bottomThird = Math.round(hemisphereNumTriangles * 0.3)
+let roots = [];
+let rootShifts = [];
+for(let i = 0; i < bottomThird; i++){ //todo make this a function
+    if (Math.random() < 0.1){ //todo tweak this num for numer of triangles
+        roots.push(true);
+        rootShifts.push(genRandValue(-0.3, 0.3)); //TODO tweak all of these to give good results
+        rootShifts.push(LimbTypes.Root * Math.random()); //TODO Make it tend downwards if root, up if branch (I think I did this)
+        rootShifts.push(genRandValue(-0.3, 0.3));
+    }
+    else{
+        roots.push(false);
+    }
+}
 
 // Given an id, extract the content's of a shader script
 // from the DOM and return the compiled shader
@@ -102,20 +120,23 @@ function initProgram() {
 
 function createScene() {
     // bool flag to determine when to draw branches/roots
-    makeHemisphere(division1, division2, originForGround, dimForGround);
+    const rootTriangles = makeHemisphere(division1, division2, originForGround, dimForGround, roots);
     makeCylinder(division1, division2, originForTrunk, dimForTrunk);
 
-    console.log(trianglesForBranches)
-    makeLimbs(trianglesForBranches, LimbTypes.Branch);
-    makeLimbs(trianglesForRoots, LimbTypes.Root);
+    // makeLimbs(trianglesForBranches, LimbTypes.Branch);
+    // console.log(rootTriangles) //todo delete
+    // console.log(rootShifts) //todo delete
+    makeLimbs(rootTriangles, LimbTypes.Root, rootShifts);
 
     // Test triangle
-    // Triangle.create(
+    // var test = Triangle.create(
     //     [
     //         0.0, 0.0, 0.0, // y
     //         1.0, 0.0, 0.0,
     //         0.0, 0.0, 1.0 // towards us
-    //     ]).draw()
+    //     ])
+    // test.draw()
+    // makeLimbs([test], LimbTypes.Root, rootShifts);
 }
 
 // general call to make and bind a new object based on current
