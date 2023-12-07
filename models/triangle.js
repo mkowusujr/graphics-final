@@ -7,12 +7,22 @@ export class Triangle {
 		this.point2 = point2;
 	}
 
-	static create(p0, p1, p2) {
+	static create(p0, p1, p2)
+	{
+		if (p1 == null && p2 == null)
+		{
+			return this.createWithArray(p0)
+		} else {
+			return this.createWithPoints(p0, p1, p2);
+			}
+	}
+
+	static createWithPoints(p0, p1, p2) {
 		return new Triangle(p0, p1, p2);
 	}
 
 	// takes in a list of nine values
-	static create(ps) {
+	static createWithArray(ps) {
 		let p0 = Point.create(ps.slice(0, 3));
 		let p1 = Point.create(ps.slice(3, 6));
 		let p2 = Point.create(ps.slice(6, 9));

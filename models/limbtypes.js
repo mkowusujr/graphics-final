@@ -1,1 +1,1 @@
-export const LimbTypes = Object.freeze({ Root: Symbol(-1), Branch: Symbol(1) });
+export const LimbTypes = Object.freeze({ Root:-1, Branch: 1});

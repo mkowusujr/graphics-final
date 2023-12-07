@@ -1,6 +1,7 @@
 import { Triangle } from "../models/triangle.js";
 import { Point } from "../models/point.js";
 import { LimbTypes } from "../models/limbtypes.js";
+import { genRandValue } from "../tessMain.js";
 
 const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);
@@ -229,17 +230,19 @@ export function makeLimbs(triangles, limbType) {
 }
 
 function makeLimb(triangle, limbType) {
+    
     const sides = 3;
     // 1 or 2
     const numSegments = Math.round(Math.random() + 1);
     // Draw segments
     for (let i = 0; i <= numSegments; i++) {
-        const xShift = Math.random(); //TODO tweak all of these to give good results
+        const xShift = genRandValue(-1, 1);//Math.random(); //TODO tweak all of these to give good results
         const yShift = limbType * Math.random(); //TODO Make it tend downwards if root, up if branch (I think I did this)
-        const zShift = Math.random();
+        const zShift = genRandValue(-1, 1);
 
         const points = [];
         const tpoints = [triangle.point0, triangle.point1, triangle.point1];
+        
         for (let j = 0; j < sides; j++) {
             const pointCoords = [tpoints[j].x + xShift, tpoints[j].y + yShift, tpoints[j].z + zShift];
             points[j] = Point.create(pointCoords);
@@ -260,7 +263,7 @@ function makeLimb(triangle, limbType) {
             }
         }
         if (i != numSegments) {
-            triangle = Point.create(points); //TODO remember to not draw this triangle
+            triangle = Triangle.create(points); //TODO remember to not draw this triangle
         }
     }
 }

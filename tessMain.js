@@ -25,7 +25,7 @@ var division2 = 10;
 var updateDisplay = true;
 
 // Setting up where the objects are displayed
-const genRandValue = (min, max) => Math.random() * (max - min) + min;
+export const genRandValue = (min, max) => Math.random() * (max - min) + min;
 
 let dimForGround = { x: 1,y: 1, z: 1 };
 let originForGround = Point.create([0, 0, 0]);
@@ -105,8 +105,9 @@ function createScene() {
     makeHemisphere(division1, division2, originForGround, dimForGround);
     makeCylinder(division1, division2, originForTrunk, dimForTrunk);
 
-    // makeLimbs(trianglesForBranches, LimbTypes.Branch);
-    // makeLimbs(trianglesForRoots, LimbTypes.Root);
+    console.log(trianglesForBranches)
+    makeLimbs(trianglesForBranches, LimbTypes.Branch);
+    makeLimbs(trianglesForRoots, LimbTypes.Root);
 
     // Test triangle
     // Triangle.create(
