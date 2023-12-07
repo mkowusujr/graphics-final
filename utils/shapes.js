@@ -1,7 +1,6 @@
 import { Triangle } from "../models/triangle.js";
 import { Point } from "../models/point.js";
 import { LimbTypes } from "../models/limbtypes.js";
-import { genRandValue } from "../tessMain.js";
 
 const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);
@@ -9,13 +8,16 @@ let cos = (theta) => Math.cos(theta);
 
 export let trianglesForBranches = []
 export let trianglesForRoots = []
-//
-// fill in code that creates the triangles for a cylinder with diameter 1
-// and height of 1 (centered at the origin) with the number of subdivisions
-// around the base and top of the cylinder (given by radialdivision) and
-// the number of subdivisions along the surface of the cylinder given by
-// heightdivision.
-//
+
+/**
+ * Creates a cylinder centered at origin.x, y, z,
+ * with radial divisions and vertical divisions.
+ * Dim affects the stretch of the object in the x, y, & z directions seperately
+ * @param {*} radialdivision Vertical divisions
+ * @param {*} heightdivision Horizontal divisions
+ * @param {*} origin Point object of the hemisphere's origin point
+ * @param {*} dim Map of scalars for x, y, & z
+ */ //todo add the branches input array and return the branch triangle array
 export function makeCylinder(radialdivision, heightdivision, origin, dim) {
     heightdivision = heightdivision < 1 ? 1 : heightdivision;
     radialdivision = radialdivision < 3 ? 3 : radialdivision;
@@ -35,14 +37,11 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim) {
             let y0 = origin.y + - r.y + u * t;
             let y1 = y0 + t;
 
-            let triangle1 = Triangle.create(
-                [
+            let triangle1 = Triangle.create([
                     x0, y0, z0,
                     x0, y1, z0,
-                    x1, y0, z1
-                ]);
-            let triangle2 = Triangle.create(
-                [
+                    x1, y0, z1]);
+            let triangle2 = Triangle.create([
                     x1, y1, z1,
                     x1, y0, z1,
                     x0, y1, z0]);
@@ -59,36 +58,33 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim) {
         }
 
         // // Draw Top Face
-        Triangle.create(
-            [
+        Triangle.create([
                 x1, origin.y - r.y, z1,
                 origin.x, origin.y - r.y, origin.z,
-                x0, origin.y - r.y, z0
-            ]
-        ).draw();
+                x0, origin.y - r.y, z0]).draw();
 
         // // Draw Bottom Face
-        Triangle.create(
-            [
+        Triangle.create([
                 x1, origin.y + r.y, z1,
                 x0, origin.y + r.y, z0,
-                origin.x, origin.y + r.y, origin.z
-            ]
-        ).draw();
+                origin.x, origin.y + r.y, origin.z]).draw();
     }
 }
 
 /**
- * Creates a hemisphere centered at origin.x, origin.y, origin.z,
- * with slices vertical sub-divisions and stacks horizontal sub-divisions
+ * Creates a hemisphere centered at origin.x, y, z,
+ * with slices vertical sub-divisions and stacks horizontal sub-divisions.
+ * Dim affects the stretch of the object in the x, y, & z directions seperately
  * @param {*} slices Vertical slices
  * @param {*} stacks Horizontal slices
  * @param {*} origin Point object of the hemisphere's origin point
+ * @param {*} dim Map of scalars for x, y, & z
+ * @param {*} roots Array of if a triangle should be added to the return array
+ * @returns Array of triangles to extrude as roots
  */
-export function makeHemisphere(slices, stacks, origin, dim, roots) { //todo add roots to the doc
-    // let counterRootTriangles = [0, []]; //todo delete?
-    let counter = 0; //todo delete?
-    let rootTriangles = []; //todo delete?
+export function makeHemisphere(slices, stacks, origin, dim, roots) {
+    let counter = 0; //todo rename?
+    let rootTriangles = []; //todo rename?
 
     slices = slices < 3 ? 3 : slices;
     stacks = stacks < 4 ? 4 : stacks % 2 == 1 ? stacks++ : stacks;
@@ -107,46 +103,33 @@ export function makeHemisphere(slices, stacks, origin, dim, roots) { //todo add 
             let coords = HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim);
             if (i == 0) {
                 // Draw Bottom
-                let t = Triangle.create(
-                    [
+                let t = Triangle.create([
                         coords.x2, coords.y1, coords.z2,
                         origin.x, origin.y - r, origin.z,
-                        coords.x3, coords.y1, coords.z3
-                    ]
-                );
-
-                counter = DecideDraw(counter, rootTriangles, roots, t);
+                        coords.x3, coords.y1, coords.z3]);
+                counter = CheckDraw(counter, rootTriangles, roots, t);
 
             } else if (i == stacks) {
                 // Draw Base (Top)
-                Triangle.create(
-                    [
+                Triangle.create([
                         coords.x1, coords.y0, coords.z1,
                         origin.x, origin.y, origin.z,
-                        coords.x0, coords.y0, coords.z0,
-                    ]
-                ).draw();
+                        coords.x0, coords.y0, coords.z0,]).draw();
             } else {
                 // Draw Sides
-                let triangle1 = Triangle.create(
-                    [
+                let triangle1 = Triangle.create([
                         coords.x1, coords.y0, coords.z1,
                         coords.x3, coords.y1, coords.z3,
-                        coords.x0, coords.y0, coords.z0
-                    ]);
+                        coords.x0, coords.y0, coords.z0]);
+                counter = CheckDraw(counter, rootTriangles, roots, triangle1);
 
-                counter = DecideDraw(counter, rootTriangles, roots, triangle1);
-
-                let triangle2 = Triangle.create(
-                    [
+                let triangle2 = Triangle.create([
                         coords.x2, coords.y1, coords.z2,
                         coords.x0, coords.y0, coords.z0,
-                        coords.x3, coords.y1, coords.z3
-                    ]);
+                        coords.x3, coords.y1, coords.z3]);
+                counter = CheckDraw(counter, rootTriangles, roots, triangle2);
 
-                counter = DecideDraw(counter, rootTriangles, roots, triangle2);
-
-                // let decisionFactor = 0.15
+                // let decisionFactor = 0.15 //todo remove?
                 // let triangles = { t1: triangle1, t2: triangle2 }
                 // decideLimb(
                 //     i,
@@ -195,11 +178,20 @@ function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim) {
     };
 }
 
-//todo doc comment
-function DecideDraw(counter, rootTriangles, roots, t){
-    if (counter < roots.length){
-        if (roots[counter]){
-            rootTriangles.push(t);
+/**
+ * Check if a triangle is supposed to be a limb or not,
+ * if it is a limb, add it to the limbTirangles array
+ * if it is not a limb, draw it
+ * @param {*} counter Current index in limbs
+ * @param {*} limbTriangles Array of triangles that are limbs
+ * @param {*} limbs Array of if a triangle should be added to the limbTriangles array
+ * @param {*} t Triangle to add/draw
+ * @returns The updated index for the roots array
+ */
+function CheckDraw(counter, limbTriangles, limbs, t){
+    if (counter < limbs.length){
+        if (limbs[counter]){
+            limbTriangles.push(t);
         }
         else{
             t.draw();
@@ -211,7 +203,7 @@ function DecideDraw(counter, rootTriangles, roots, t){
     }
     return counter + 1;
 }
-
+//todo remove?
 function decideLimb(index, heightdivision, decisionFactor, triangles, limbType) {
     decisionFactor *= 100;
     let decision = Math.floor(Math.random() * 100);
@@ -245,20 +237,24 @@ function decideLimb(index, heightdivision, decisionFactor, triangles, limbType) 
 }
 
 /**
- * Create the branches/roots
+ * Create the limbs (branches/roots)
  * @param {*} triangles Array of triangles to make branches from
- * @param {*} limbType Enum of branch or root
+ * @param {*} rootShifts Array of shift values for x, y, & z. length = 3 * triangles.length
  */
-export function makeLimbs(triangles, limbType, rootShifts) { //todo new doc
+export function makeLimbs(triangles, rootShifts) {
     for (var i = 0; i < triangles.length; i++) {
-        makeLimb(triangles[i], limbType, rootShifts);
+        makeLimb(triangles[i], rootShifts);
     }
 }
 
-function makeLimb(triangle, limbType, rootShifts) { //todo new doc
+/**
+ * Makes a single limb (root/branch)
+ * @param {*} triangle Base triangle to start from
+ * @param {*} rootShifts Array of x, y, & z amounts to shift the base triangle by
+ */
+function makeLimb(triangle, rootShifts) {
     const sides = 3;
-    // 1 or 2
-    const numSegments = Math.round(Math.random() + 1);
+    const numSegments = Math.round(Math.random() + 1); // 1 or 2 //todo probably change to mat's func
     // Draw segments
     for (let i = 0; i <= numSegments; i++) {
         const points = [];

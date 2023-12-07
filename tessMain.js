@@ -51,6 +51,8 @@ const hemisphereNumTriangles = (division2 - 1) * division1 * 2 + division1
 const bottomThird = Math.round(hemisphereNumTriangles * 0.3)
 let roots = [];
 let rootShifts = [];
+//todo probably decide num segments here too, each section always goes out in the same dir
+//todo clean up like everything :(
 for(let i = 0; i < bottomThird; i++){ //todo make this a function
     if (Math.random() < 0.1){ //todo tweak this num for numer of triangles
         roots.push(true);
@@ -126,7 +128,7 @@ function createScene() {
     // makeLimbs(trianglesForBranches, LimbTypes.Branch);
     // console.log(rootTriangles) //todo delete
     // console.log(rootShifts) //todo delete
-    makeLimbs(rootTriangles, LimbTypes.Root, rootShifts);
+    makeLimbs(rootTriangles, rootShifts);
 
     // Test triangle
     // var test = Triangle.create(
