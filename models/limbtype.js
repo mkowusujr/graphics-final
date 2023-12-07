@@ -1,0 +1,1 @@
+export const LimbType = Object.freeze({ Root:-1, Branch: 1});

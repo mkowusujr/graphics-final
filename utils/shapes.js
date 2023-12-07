@@ -1,6 +1,6 @@
 import { Triangle } from "../models/triangle.js";
 import { Point } from "../models/point.js";
-import { LimbTypes } from "../models/limbtypes.js";
+import { LimbType } from "../models/limbtype.js";
 
 const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);
@@ -53,7 +53,7 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim) {
                 heightdivision,
                 decisionFactor,
                 triangles,
-                LimbTypes.Branch
+                LimbType.Branch
             );
         }
 
@@ -136,7 +136,7 @@ export function makeHemisphere(slices, stacks, origin, dim, roots) {
                 //     stacks,
                 //     decisionFactor,
                 //     triangles,
-                //     LimbTypes.Root
+                //     LimbType.Root
                 // );
             }
         }
@@ -210,7 +210,7 @@ function decideLimb(index, heightdivision, decisionFactor, triangles, limbType) 
     let shouldSelectTopTriange = decision % 2 == 0
     let start = Math.floor((heightdivision / 1.5));
     
-    if (limbType == LimbTypes.Branch) {
+    if (limbType == LimbType.Branch) {
         if (start <= index && decision < decisionFactor)
         {
             if (shouldSelectTopTriange) {

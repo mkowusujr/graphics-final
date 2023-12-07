@@ -4,11 +4,10 @@ import { Point } from "./models/point.js";
 import { fragmentshader } from "./shaders/fragmentshader.gsls.js";
 import { vertexshader } from "./shaders/vertexshader.gsls.js";
 import { getAngles, getTranslations, gotKey } from "./utils/controls.js";
-import { LimbTypes } from "./models/limbtypes.js";
+import { LimbType } from "./models/limbtype.js";
 import { Triangle } from "./models/triangle.js"; //todo remove
 
-// Global variables that are set and used
-// across the application
+// Global variables that are set and used across the application
 let gl, program, points, bary, indices, canvas;
 export const getPointsArr = () => points;
 export const getBaryArr = () => bary;
@@ -48,20 +47,36 @@ let originForTrunk = Point.create([
 
 const cylinderNumTriangles = 0; //todo
 const hemisphereNumTriangles = (division2 - 1) * division1 * 2 + division1
-const bottomThird = Math.round(hemisphereNumTriangles * 0.3)
 let roots = [];
-let rootShifts = [];
+let rootShifts = []; //todo ask matt to help rethink this array, it seems hard
+//todo probable make a roots class to hold all of this complicated data
+DecideLimbs(LimbType.Root, roots, rootShifts, 0.1, hemisphereNumTriangles, 0.3)
+
+
+
 //todo probably decide num segments here too, each section always goes out in the same dir
 //todo clean up like everything :(
-for(let i = 0; i < bottomThird; i++){ //todo make this a function
-    if (Math.random() < 0.1){ //todo tweak this num for numer of triangles
-        roots.push(true);
-        rootShifts.push(genRandValue(-0.3, 0.3)); //TODO tweak all of these to give good results
-        rootShifts.push(LimbTypes.Root * Math.random()); //TODO Make it tend downwards if root, up if branch (I think I did this)
-        rootShifts.push(genRandValue(-0.3, 0.3));
-    }
-    else{
-        roots.push(false);
+/**
+ * Decide which triangles will become limbs
+ * @param {*} limbType Enum of Root or Branch, determines if yShift is +/-
+ * @param {*} limbs Array of t/f, true if the triangle at that index will be a limb
+ * @param {*} shifts Array of shift values for each limb
+ * @param {*} percentLimbs Percent chance that a triangle becomes a limb
+ * @param {*} numTriangles Number of triangles in the object (not including shape tops)
+ * @param {*} percentTriangles Percent of triangles that can be limbs
+ */
+function DecideLimbs (limbType, limbs, shifts, percentLimbs, numTriangles, percentTriangles){
+    const bottomThird = Math.round(numTriangles * percentTriangles)
+    for(let i = 0; i < bottomThird; i++){
+        if (Math.random() < percentLimbs){ //todo tweak percentLimbs for number of triangles
+            limbs.push(true);
+            shifts.push(genRandValue(-0.3, 0.3)); //TODO tweak all of these to give good results
+            shifts.push(limbType * Math.random());
+            shifts.push(genRandValue(-0.3, 0.3));
+        }
+        else{
+            limbs.push(false);
+        }
     }
 }
 
@@ -125,7 +140,7 @@ function createScene() {
     const rootTriangles = makeHemisphere(division1, division2, originForGround, dimForGround, roots);
     makeCylinder(division1, division2, originForTrunk, dimForTrunk);
 
-    // makeLimbs(trianglesForBranches, LimbTypes.Branch);
+    // makeLimbs(trianglesForBranches, LimbType.Branch);
     // console.log(rootTriangles) //todo delete
     // console.log(rootShifts) //todo delete
     makeLimbs(rootTriangles, rootShifts);
@@ -138,7 +153,7 @@ function createScene() {
     //         0.0, 0.0, 1.0 // towards us
     //     ])
     // test.draw()
-    // makeLimbs([test], LimbTypes.Root, rootShifts);
+    // makeLimbs([test], LimbType.Root, rootShifts);
 }
 
 // general call to make and bind a new object based on current
