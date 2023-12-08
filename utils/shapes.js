@@ -82,7 +82,7 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim) {
  * @param {*} roots Array of if a triangle should be added to the return array
  * @returns Array of triangles to extrude as roots
  */
-export function makeHemisphere(slices, stacks, origin, dim, roots) {
+export function makeHemisphere(slices, stacks, origin, dim, roots, hemisphereStart) {
     let counter = 0; //todo rename?
     let rootTriangles = []; //todo rename?
 
@@ -107,7 +107,7 @@ export function makeHemisphere(slices, stacks, origin, dim, roots) {
                         coords.x2, coords.y1, coords.z2,
                         origin.x, origin.y - r, origin.z,
                         coords.x3, coords.y1, coords.z3]);
-                counter = CheckDraw(counter, rootTriangles, roots, t);
+                counter = checkDraw(counter, rootTriangles, roots, t);
 
             } else if (i == stacks) {
                 // Draw Base (Top)
@@ -116,28 +116,19 @@ export function makeHemisphere(slices, stacks, origin, dim, roots) {
                         origin.x, origin.y, origin.z,
                         coords.x0, coords.y0, coords.z0,]).draw();
             } else {
+                
                 // Draw Sides
                 let triangle1 = Triangle.create([
                         coords.x1, coords.y0, coords.z1,
                         coords.x3, coords.y1, coords.z3,
                         coords.x0, coords.y0, coords.z0]);
-                counter = CheckDraw(counter, rootTriangles, roots, triangle1);
+                counter = checkDraw(counter, rootTriangles, roots, triangle1, hemisphereStart);
 
                 let triangle2 = Triangle.create([
                         coords.x2, coords.y1, coords.z2,
                         coords.x0, coords.y0, coords.z0,
                         coords.x3, coords.y1, coords.z3]);
-                counter = CheckDraw(counter, rootTriangles, roots, triangle2);
-
-                // let decisionFactor = 0.15 //todo remove?
-                // let triangles = { t1: triangle1, t2: triangle2 }
-                // decideLimb(
-                //     i,
-                //     stacks,
-                //     decisionFactor,
-                //     triangles,
-                //     LimbType.Root
-                // );
+                counter = checkDraw(counter, rootTriangles, roots, triangle2, hemisphereStart);
             }
         }
     }
@@ -188,9 +179,9 @@ function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim) {
  * @param {*} t Triangle to add/draw
  * @returns The updated index for the roots array
  */
-function CheckDraw(counter, limbTriangles, limbs, t){
-    if (counter < limbs.length){
-        if (limbs[counter]){
+function checkDraw(counter, limbTriangles, limbs, t, startRange){
+    if (counter < startRange + limbs.length && counter >= startRange) {
+        if (limbs[counter - startRange] !== null){
             limbTriangles.push(t);
         }
         else{
@@ -203,84 +194,85 @@ function CheckDraw(counter, limbTriangles, limbs, t){
     }
     return counter + 1;
 }
-//todo remove?
-function decideLimb(index, heightdivision, decisionFactor, triangles, limbType) {
-    decisionFactor *= 100;
-    let decision = Math.floor(Math.random() * 100);
-    let shouldSelectTopTriange = decision % 2 == 0
-    let start = Math.floor((heightdivision / 1.5));
+
+// //todo remove?
+// function decideLimb(index, heightdivision, decisionFactor, triangles, limbType) {
+//     decisionFactor *= 100;
+//     let decision = Math.floor(Math.random() * 100);
+//     let shouldSelectTopTriange = decision % 2 == 0
+//     let start = Math.floor((heightdivision / 1.5));
     
-    if (limbType == LimbType.Branch) {
-        if (start <= index && decision < decisionFactor)
-        {
-            if (shouldSelectTopTriange) {
-                trianglesForBranches.push(triangles.t2);
-            } else {
-                trianglesForBranches.push(triangles.t1);
-            }
-        } else {
-            triangles.t1.draw();
-            triangles.t2.draw();
-        }
-    } else {
-        if (index <= start && decision < decisionFactor) {
-            if (shouldSelectTopTriange) {
-                trianglesForRoots.push(triangles.t2);
-            } else {
-                trianglesForRoots.push(triangles.t1);
-            }
-        } else {
-            triangles.t1.draw();
-            triangles.t2.draw();
-        }
-    }
-}
+//     if (limbType == LimbType.Branch) {
+//         if (start <= index && decision < decisionFactor)
+//         {
+//             if (shouldSelectTopTriange) {
+//                 trianglesForBranches.push(triangles.t2);
+//             } else {
+//                 trianglesForBranches.push(triangles.t1);
+//             }
+//         } else {
+//             triangles.t1.draw();
+//             triangles.t2.draw();
+//         }
+//     } else {
+//         if (index <= start && decision < decisionFactor) {
+//             if (shouldSelectTopTriange) {
+//                 trianglesForRoots.push(triangles.t2);
+//             } else {
+//                 trianglesForRoots.push(triangles.t1);
+//             }
+//         } else {
+//             triangles.t1.draw();
+//             triangles.t2.draw();
+//         }
+//     }
+// }
+
+// /**
+//  * Create the limbs (branches/roots)
+//  * @param {*} triangles Array of triangles to make branches from
+//  * @param {*} rootShifts Array of shift values for x, y, & z. length = 3 * triangles.length
+//  */
+// export function makeLimbs(triangles, rootShifts) {
+//     for (var i = 0; i < triangles.length; i++) {
+//         makeLimb(triangles[i], rootShifts);
+//     }
+// }
 
 /**
- * Create the limbs (branches/roots)
- * @param {*} triangles Array of triangles to make branches from
- * @param {*} rootShifts Array of shift values for x, y, & z. length = 3 * triangles.length
- */
-export function makeLimbs(triangles, rootShifts) {
-    for (var i = 0; i < triangles.length; i++) {
-        makeLimb(triangles[i], rootShifts);
-    }
-}
-
-/**
- * Makes a single limb (root/branch)
- * @param {*} triangle Base triangle to start from
- * @param {*} rootShifts Array of x, y, & z amounts to shift the base triangle by
- */
-function makeLimb(triangle, rootShifts) {
-    const sides = 3;
-    const numSegments = Math.round(Math.random() + 1); // 1 or 2 //todo probably change to mat's func
-    // Draw segments
-    for (let i = 0; i <= numSegments; i++) {
-        const points = [];
-        const tpoints = [triangle.point0, triangle.point1, triangle.point1];
+//  * Makes a single limb (root/branch)
+//  * @param {*} triangle Base triangle to start from
+//  * @param {*} rootShifts Array of x, y, & z amounts to shift the base triangle by
+//  */
+// function makeLimb(triangle, rootShifts) {
+//     const sides = 3;
+//     const numSegments = Math.round(Math.random() + 1); // 1 or 2 //todo probably change to mat's func
+//     // Draw segments
+//     for (let i = 0; i <= numSegments; i++) {
+//         const points = [];
+//         const tpoints = [triangle.point0, triangle.point1, triangle.point1];
         
-        for (let j = 0; j < sides; j++) {
-            const pointCoords = [tpoints[j].x + rootShifts[i * sides], tpoints[j].y + rootShifts[i * sides + 1], tpoints[j].z + rootShifts[i * sides + 2]];
-            points[j] = Point.create(pointCoords);
-        }
+//         for (let j = 0; j < sides; j++) {
+//             const pointCoords = [tpoints[j].x + rootShifts[i * sides], tpoints[j].y + rootShifts[i * sides + 1], tpoints[j].z + rootShifts[i * sides + 2]];
+//             points[j] = Point.create(pointCoords);
+//         }
 
-        for (let j = 0; j < sides; j++) {
-            let k = tpoints.length - 1;
-            if (i != numSegments) {
-                // Draw sides
-                Triangle.create(tpoints[j], tpoints[k], points[j]).draw();
-                Triangle.create(points[k], points[i], tpoints[k]).draw();
-                k = j - 1;
-            }
-            else {
-                // Draw tip
-                //TODO find the mid point of the triangle, then shift that point
-                // Triangle.create().draw();
-            }
-        }
-        if (i != numSegments) {
-            triangle = Triangle.create(points); //TODO remember to not draw this triangle
-        }
-    }
-}
+//         for (let j = 0; j < sides; j++) {
+//             let k = tpoints.length - 1;
+//             if (i != numSegments) {
+//                 // Draw sides
+//                 Triangle.create(tpoints[j], tpoints[k], points[j]).draw();
+//                 Triangle.create(points[k], points[i], tpoints[k]).draw();
+//                 k = j - 1;
+//             }
+//             else {
+//                 // Draw tip
+//                 //TODO find the mid point of the triangle, then shift that point
+//                 // Triangle.create().draw();
+//             }
+//         }
+//         if (i != numSegments) {
+//             triangle = Triangle.create(points); //TODO remember to not draw this triangle
+//         }
+//     }
+// }

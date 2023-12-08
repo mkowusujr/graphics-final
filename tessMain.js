@@ -1,12 +1,13 @@
 "use strict";
-import { makeCylinder, makeHemisphere, makeLimbs, trianglesForBranches, trianglesForRoots } from "./utils/shapes.js";
+import { makeCylinder, makeHemisphere } from "./utils/shapes.js";
 import { Point } from "./models/point.js";
 import { fragmentshader } from "./shaders/fragmentshader.gsls.js";
 import { vertexshader } from "./shaders/vertexshader.gsls.js";
 import { getAngles, getTranslations, gotKey } from "./utils/controls.js";
 import { LimbType } from "./models/limbtype.js";
 import { Triangle } from "./models/triangle.js"; //todo remove
-
+import { genRandValue } from "./utils/utils.js";
+import { Limb } from "./models/limb.js";
 // Global variables that are set and used across the application
 let gl, program, points, bary, indices, canvas;
 export const getPointsArr = () => points;
@@ -25,8 +26,6 @@ var division2 = 10;
 var updateDisplay = true;
 
 // Setting up where the objects are displayed
-export const genRandValue = (min, max) => Math.random() * (max - min) + min;
-
 let dimForGround = { x: 1,y: 1, z: 1 };
 let originForGround = Point.create([0, 0, 0]);
 let dimForTrunk = { x: 1, y: 1, z: 1};
@@ -44,41 +43,16 @@ let originForTrunk = Point.create([
     originForGround.y + dimForTrunk.y / 2,
     originForGround.z + randZ,
 ]);
+const hemisphereNumTriangles = (division2 - 1) * division1 * 2 + division1;
+const cylinderNumTriangles = -1;
+let rootOffsets = []
+Limb.decideLimbs(LimbType.Root, rootOffsets, .1, hemisphereNumTriangles, .30)
+const hemisphereStart = hemisphereNumTriangles * .10;
 
-const cylinderNumTriangles = 0; //todo
-const hemisphereNumTriangles = (division2 - 1) * division1 * 2 + division1
-let roots = [];
-let rootShifts = []; //todo ask matt to help rethink this array, it seems hard
-//todo probable make a roots class to hold all of this complicated data
-DecideLimbs(LimbType.Root, roots, rootShifts, 0.1, hemisphereNumTriangles, 0.3)
+// let rootShifts = []; //todo ask matt to help rethink this array, it seems hard
+// //todo probable make a roots class to hold all of this complicated data
+// DecideLimbs(LimbType.Root, roots, rootShifts, 0.1, hemisphereNumTriangles, 0.3)
 
-
-
-//todo probably decide num segments here too, each section always goes out in the same dir
-//todo clean up like everything :(
-/**
- * Decide which triangles will become limbs
- * @param {*} limbType Enum of Root or Branch, determines if yShift is +/-
- * @param {*} limbs Array of t/f, true if the triangle at that index will be a limb
- * @param {*} shifts Array of shift values for each limb
- * @param {*} percentLimbs Percent chance that a triangle becomes a limb
- * @param {*} numTriangles Number of triangles in the object (not including shape tops)
- * @param {*} percentTriangles Percent of triangles that can be limbs
- */
-function DecideLimbs (limbType, limbs, shifts, percentLimbs, numTriangles, percentTriangles){
-    const bottomThird = Math.round(numTriangles * percentTriangles)
-    for(let i = 0; i < bottomThird; i++){
-        if (Math.random() < percentLimbs){ //todo tweak percentLimbs for number of triangles
-            limbs.push(true);
-            shifts.push(genRandValue(-0.3, 0.3)); //TODO tweak all of these to give good results
-            shifts.push(limbType * Math.random());
-            shifts.push(genRandValue(-0.3, 0.3));
-        }
-        else{
-            limbs.push(false);
-        }
-    }
-}
 
 // Given an id, extract the content's of a shader script
 // from the DOM and return the compiled shader
@@ -137,13 +111,13 @@ function initProgram() {
 
 function createScene() {
     // bool flag to determine when to draw branches/roots
-    const rootTriangles = makeHemisphere(division1, division2, originForGround, dimForGround, roots);
+    const rootTriangles = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart);
     makeCylinder(division1, division2, originForTrunk, dimForTrunk);
 
     // makeLimbs(trianglesForBranches, LimbType.Branch);
     // console.log(rootTriangles) //todo delete
     // console.log(rootShifts) //todo delete
-    makeLimbs(rootTriangles, rootShifts);
+    // makeLimbs(rootTriangles, rootShifts);
 
     // Test triangle
     // var test = Triangle.create(

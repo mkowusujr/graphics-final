@@ -1,0 +1,1 @@
+export const genRandValue = (min, max) => Math.random() * (max - min) + min;
