@@ -1,5 +1,6 @@
 import {genRandValue} from "../utils/utils.js"
 import { Point } from "./point.js";
+import { Triangle } from "./triangle.js";
 export class Limb {
     constructor(startTriangle, offsetArray) {
         this.startTriangle = startTriangle;
@@ -11,7 +12,7 @@ export class Limb {
         let tris = [curTri];
         let offset, curTriPoints;
 
-        for (i = 0; i < this.offsetArray.length - 1; i++) {
+        for (let i = 0; i < this.offsetArray.length - 1; i++) {
             offset = this.offsetArray[i];
             curTriPoints = [curTri.point0, curTri.point1, curTri.point2];
             let triPoints = [];
@@ -34,13 +35,13 @@ export class Limb {
     }
 
     draw() {
-        let baseTriangles = limbConstructTriangle();
+        let baseTriangles = this.limbConstructTriangle();
         for (let i = 0; i < baseTriangles.length; i++) {
             if (i != baseTriangles.length - 1) {
-                drawSegment(baseTriangles[i], baseTriangles[i + 1]);
+                this.drawSegment(baseTriangles[i], baseTriangles[i + 1]);
             }
             else {
-                drawTip(baseTriangles[i], this.offsetArray[i]);
+                this.drawTip(baseTriangles[i], this.offsetArray[i]);
             }
         }
     }
@@ -68,6 +69,12 @@ export class Limb {
                 curBaseTriPoints[i],
                 nxtBaseTriPoints[(i + 1) % 3]
             ).draw();
+        }
+    }
+
+    static drawLimbs(limbs){
+        for (let i = 0; i < limbs.length; i++){
+            limbs[i].draw();
         }
     }
 
