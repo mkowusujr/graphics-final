@@ -1,5 +1,5 @@
 import { Point } from "./point.js";
-import { getBaryArr, getIndices, getPointsArr } from "../tessMain.js";
+import { getBaryArr, getUVSArr, getIndices, getPointsArr } from "../tessMain.js";
 export class Triangle {
 	constructor(point0, point1, point2) {
 		this.point0 = point0;
@@ -7,14 +7,12 @@ export class Triangle {
 		this.point2 = point2;
 	}
 
-	static create(p0, p1, p2)
-	{
-		if (p1 == null && p2 == null)
-		{
+	static create(p0, p1, p2) {
+		if (p1 == null && p2 == null) {
 			return this.createWithArray(p0)
 		} else {
 			return this.createWithPoints(p0, p1, p2);
-			}
+		}
 	}
 
 	static createWithPoints(p0, p1, p2) {
@@ -30,10 +28,11 @@ export class Triangle {
 	}
 
 	draw() {
-		let points = getPointsArr()
-		let bary = getBaryArr()
+		let points = getPointsArr();
+		let bary = getBaryArr();
+		// let uvs = getUVSArr();
 		let indices = getIndices();
-//
+
 		let nverts = points.length / 4;
 		const coords = [
 			this.point0.toList(), //[x0, y0, z0],
@@ -51,10 +50,36 @@ export class Triangle {
 			for (let j = 0; j < dim[i].length; j++) {
 				points.push(coords[i][j]);
 				bary.push(dim[i][j]);
+				// uvs.push(dim[i][j]);
 			}
 			points.push(1);
 			indices.push(nverts);
 			nverts++;
 		}
+	}
+
+	static pushToTopTexture() {
+		let uvs = getUVSArr();
+		uvs.push(0.0);
+		uvs.push(1.0);
+		uvs.push(1.0);
+		uvs.push(.0);
+		uvs.push(1.0);
+		uvs.push(1.0);
+	}
+
+	static pushToBottomTexture() {
+		let uvs = getUVSArr();
+		uvs.push(0.0);
+		uvs.push(1.0);
+		uvs.push(0.0);
+		uvs.push(0.0);
+		uvs.push(1.0);
+		uvs.push(0.0);
+	}
+
+	static pushToBothTexture() {
+		this.pushToTopTexture();
+		this.pushToBottomTexture();
 	}
 }

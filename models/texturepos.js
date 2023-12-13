@@ -1,0 +1,1 @@
+export const TexturePos = Object.freeze({ TOP: "TOP", BOTTOM: "BOTTOM", BOTH: "BOTH" });

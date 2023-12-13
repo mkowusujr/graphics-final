@@ -8,21 +8,27 @@ import { LimbType } from "./models/limbtype.js";
 import { Triangle } from "./models/triangle.js"; //todo remove
 import { genRandValue } from "./utils/utils.js";
 import { Limb } from "./models/limb.js";
+
 // Global variables that are set and used across the application
-let gl, program, points, bary, indices, canvas;
+let gl, program, points, bary, uvs, indices, canvas;
+
+let dirtTexture;
+
 export const getPointsArr = () => points;
 export const getBaryArr = () => bary;
+export const getUVSArr = () => uvs;
 export const getIndices = () => indices;
 
 // VAO stuff
 var myVAO = null;
 var myVertexBuffer = null;
 var myBaryBuffer = null;
+var myUVBuffer = null;
 var myIndexBuffer = null;
 
 // Other globals with default values;
-var division1 = 25;
-var division2 = 10;
+var division1 = 10;
+var division2 = 4;
 var updateDisplay = true;
 
 // Setting up where the objects are displayed
@@ -44,6 +50,7 @@ let originForTrunk = Point.create([
     originForGround.z + randZ,
 ]);
 const hemisphereNumTriangles = (division2 - 1) * division1 * 2 + division1;
+console.log(hemisphereNumTriangles);
 const cylinderNumTriangles = -1;
 let rootOffsets = []
 Limb.decideLimbs(LimbType.Root, rootOffsets, .1, hemisphereNumTriangles, .30)
@@ -104,10 +111,38 @@ function initProgram() {
     // We attach the location of these shader values to the program instance
     // for easy access later in the code
     program.aVertexPosition = gl.getAttribLocation(program, "aVertexPosition");
+    program.aVertexTextureCoords = gl.getAttribLocation(program, 'aVertexTextureCoords');
+    program.uSampler = gl.getUniformLocation(program, 'uSampler');
     program.aBary = gl.getAttribLocation(program, "bary");
     program.uTheta = gl.getUniformLocation(program, "theta");
     program.uTranslation = gl.getUniformLocation(program, "translation");
+
+    // set up textures
+    dirtTexture = gl.createTexture();
+    const dirtImg = new Image();
+
+    (async () => {
+        dirtImg.src = "./shaders/dirt3.jpg";
+        await dirtImg.decode();
+
+        console.log(`width: ${dirtImg.width}, height: ${dirtImg.height}`);
+        gl.bindTexture(gl.TEXTURE_2D, dirtTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, dirtImg);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+
+        createNewShape();
+
+        // do a draw
+        draw();
+    })();
 }
+
+// async function bindTextureThenRun()
+// {
+    
+// }
 
 function createScene() {
     // bool flag to determine when to draw branches/roots
@@ -138,6 +173,7 @@ export function createNewShape() {
     points = [];
     indices = [];
     bary = [];
+    uvs = [];
 
     createScene();
 
@@ -152,12 +188,19 @@ export function createNewShape() {
     gl.enableVertexAttribArray(program.aVertexPosition);
     gl.vertexAttribPointer(program.aVertexPosition, 4, gl.FLOAT, false, 0, 0);
 
-    // create and bind bary buffer
-    if (myBaryBuffer == null) myBaryBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, myBaryBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bary), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(program.aBary);
-    gl.vertexAttribPointer(program.aBary, 3, gl.FLOAT, false, 0, 0);
+    // // create and bind bary buffer
+    // if (myBaryBuffer == null) myBaryBuffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ARRAY_BUFFER, myBaryBuffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bary), gl.STATIC_DRAW);
+    // gl.enableVertexAttribArray(program.aBary);
+    // gl.vertexAttribPointer(program.aBary, 3, gl.FLOAT, false, 0, 0);
+    // create and bind uv buffer
+    if (myUVBuffer == null) myUVBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, myUVBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uvs), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(program.aVertexTextureCoords);
+    // note that texture uv's are 2d, which is why there's a 2 below
+    gl.vertexAttribPointer(program.aVertexTextureCoords, 2, gl.FLOAT, false, 0, 0);
 
     // uniform values
     gl.uniform3fv(program.uTheta, new Float32Array(getAngles()));
@@ -190,6 +233,11 @@ export function draw() {
     // Bind the VAO
     gl.bindVertexArray(myVAO);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, myIndexBuffer);
+
+    // bind the texture
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, dirtTexture);
+    gl.uniform1i(program.uSampler, 0);
 
     // Draw to the scene using triangle primitives
     gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
@@ -235,10 +283,10 @@ function init() {
     initProgram();
 
     // create and bind your current object
-    createNewShape();
+    // createNewShape();
 
-    // do a draw
-    draw();
+    // // do a draw
+    // draw();
 }
 
 init();

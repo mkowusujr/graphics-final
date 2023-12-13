@@ -2,7 +2,7 @@ import { Triangle } from "../models/triangle.js";
 import { Point } from "../models/point.js";
 import { LimbType } from "../models/limbtype.js";
 import { Limb } from "../models/limb.js"
-
+import { TexturePos } from "../models/texturepos.js";
 const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);
 let cos = (theta) => Math.cos(theta);
@@ -100,28 +100,29 @@ export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisph
                 let t = Triangle.create([
                         coords.x2, coords.y1, coords.z2,
                         origin.x, origin.y - r, origin.z,
-                        coords.x3, coords.y1, coords.z3]);
-                counter = checkDraw(counter, roots, rootOffsets, t, hemisphereStart);
+                    coords.x3, coords.y1, coords.z3]);
+                counter = checkDraw(counter, roots, rootOffsets, t, hemisphereStart, TexturePos.BOTTOM);
 
             } else if (i == stacks) {
                 // Draw Base (Top)
                 Triangle.create([
                         coords.x1, coords.y0, coords.z1,
                         origin.x, origin.y, origin.z,
-                        coords.x0, coords.y0, coords.z0,]).draw();
+                    coords.x0, coords.y0, coords.z0,]).draw();
+                Triangle.pushToTopTexture();
             } else {
                 // Draw Sides
                 let triangle1 = Triangle.create([
                         coords.x1, coords.y0, coords.z1,
                         coords.x3, coords.y1, coords.z3,
                         coords.x0, coords.y0, coords.z0]);
-                counter = checkDraw(counter, roots, rootOffsets, triangle1, hemisphereStart);
+                counter = checkDraw(counter, roots, rootOffsets, triangle1, hemisphereStart, TexturePos.TOP);
 
                 let triangle2 = Triangle.create([
                         coords.x2, coords.y1, coords.z2,
                         coords.x0, coords.y0, coords.z0,
                         coords.x3, coords.y1, coords.z3]);
-                counter = checkDraw(counter, roots, rootOffsets, triangle2, hemisphereStart);
+                counter = checkDraw(counter, roots, rootOffsets, triangle2, hemisphereStart, TexturePos.BOTTOM);
             }
         }
     }
@@ -170,13 +171,16 @@ function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim) {
  * @param {*} limbs Array of triangles that are limbs
  * @param {*} limbsDecide Array of if a triangle should be added to the limbTriangles array
  * @param {*} t Triangle to add/draw
+ * @param {*} texturePos Enum position of what points to push for the texture
  * @returns The updated index for the roots array
  */ //todo update the doc comment
-function checkDraw(counter, limbs, limbsDecide, t, startRange){
+function checkDraw(counter, limbs, limbsDecide, t, startRange, texturePos) {
+    let isTexturePushed = true;
     if (counter < startRange + limbsDecide.length && counter >= startRange) {
         if (limbsDecide[counter - startRange] !== null){
             let limb = new Limb(t, limbsDecide[counter - startRange]);
             limbs.push(limb);
+            isTexturePushed = false;
         }
         else{
             t.draw();
@@ -186,6 +190,22 @@ function checkDraw(counter, limbs, limbsDecide, t, startRange){
     else{
         t.draw();
     }
+    if (isTexturePushed)
+    {
+        switch (texturePos)
+        {
+            case "TOP":
+                Triangle.pushToTopTexture();
+                break;
+            case "BOTTOM":
+                Triangle.pushToBottomTexture();
+                break;
+            case "BOTH":
+                Triangle.pushToBothTexture();
+                break;
+        }
+    }
+    
     return counter + 1;
 }
 

@@ -2,10 +2,13 @@ export const vertexshader =
   `#version 300 es
       in vec4 aVertexPosition;
       in vec3 bary;
+      in vec2 aVertexTextureCoords;
+
       uniform vec3 theta;
       uniform vec3 translation;
 
       out vec3 vbc;
+      out vec2 vTextureCoords;
 
       void main()
       {
@@ -38,5 +41,6 @@ export const vertexshader =
                           0.0, 0.0, 0.0, 1.0);
         gl_Position = rz * ry * rx * aVertexPosition * tscxyz;
         vbc = bary;
+        vTextureCoords = aVertexTextureCoords;
       }
 `;
