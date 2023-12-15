@@ -103,7 +103,7 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim, branch
  * @returns Array of limb objects to draw as roots
  */
 export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisphereStart, texture) {
-    // Triangle.setupTexture(texture);
+    Triangle.setupTexture(texture);
 
     let triangleIndex = 0;
     let roots = [];
@@ -156,7 +156,7 @@ export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisph
     }
     
     Triangle.renderBuffer();
-    // Triangle.clearTextureBuffer();
+    Triangle.clearTextureBuffer();
     return roots;
 }
 

@@ -57,12 +57,10 @@ export class Triangle {
 	}
 
 	static renderBuffer() {
-		Triangle.setupTexture();
 		Triangle.setupDrawingBuffers();
 		Triangle.renderTriangle();
 		
 		clearDataArrs();
-		Triangle.clearTextureBuffer();
 	}
 
 	setupDataBuffers() {
@@ -86,7 +84,7 @@ export class Triangle {
 		}
 	}
 
-	 static async setupTexture(textureFile) {
+	static async setupTexture(textureFile) {
 		Triangle.texture = gl.createTexture();
 		const textureImg = new Image();
 
