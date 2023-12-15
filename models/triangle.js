@@ -1,8 +1,8 @@
 import { Point } from "./point.js";
 import { gl, program } from "../tessMain.js";
 import { getAngles, getTranslations, gotKey } from "../utils/controls.js";
-let uvs = [], indices = [], points = [];
-
+// let uvs = [], indices = [], points = [];
+import { getIndices, getPoints, getUVS } from "../tessMain.js";
 // VAO stuff
 var myVAO = null;
 var myVertexBuffer = null;
@@ -11,10 +11,9 @@ var myUVBuffer = null;
 var myIndexBuffer = null;
 
 let texture
-var updateDisplay = true;
 
 export class Triangle {
-	constructor(point0, point1, point2) {
+	constructor(point0, point1, point2) { //todo add texture as a field
 		this.point0 = point0;
 		this.point1 = point1;
 		this.point2 = point2;
@@ -40,10 +39,10 @@ export class Triangle {
 		return new Triangle(p0, p1, p2);
 	}
 
-	draw(texturePos, textureFile)
-	{
+	draw(texturePos, textureFile) {
+		let points = getPoints();
 		textureFile = "./shaders/" + textureFile;
-		console.log(textureFile);
+	
 		(async () => {
 			switch (texturePos) {
 				case "TOP":
@@ -59,30 +58,39 @@ export class Triangle {
 
 			await this.setupTextures(textureFile);
 			this.setupDataBuffers();
-			this.setupDrawingBuffers();
-			this.renderTriangle();
+			if(points.length >= 1000 * 3){
+				Triangle.renderBuffer();
+			}
 		})();
 	}
 
+	static renderBuffer() {
+		let points = getPoints();
+		let indices = getIndices();
+		let uvs = getUVS();
+		Triangle.setupDrawingBuffers();
+		Triangle.renderTriangle();
+		points = [];
+		
+		indices = [];
+		
+		uvs = [];
+	}
+
 	setupDataBuffers() {
+		let points = getPoints();
+		let indices = getIndices();
 		let nverts = points.length / 4;
 		const coords = [
 			this.point0.toList(), //[x0, y0, z0],
 			this.point1.toList(), //[x1, y1, z1],
 			this.point2.toList(), //[x2, y2, z2],
 		];
-		const dim = [
-			[1.0, 0.0, 0.0],
-			[0.0, 1.0, 0.0],
-			[0.0, 0.0, 1.0],
-		];
-
+	
 		// Push all vertices
-		for (let i = 0; i < dim.length; i++) {
-			for (let j = 0; j < dim[i].length; j++) {
+		for (let i = 0; i < coords.length; i++) {
+			for (let j = 0; j < coords[i].length; j++) {
 				points.push(coords[i][j]);
-				// bary.push(dim[i][j]);
-				// uvs.push(dim[i][j]);
 			}
 			points.push(1);
 			indices.push(nverts);
@@ -90,15 +98,14 @@ export class Triangle {
 		}
 	}
 
-	async setupTextures(textureFile)
-	{
+	async setupTextures(textureFile) {
 		texture = gl.createTexture();
 		const textureImg = new Image();
 
 		textureImg.src = textureFile;
 		await textureImg.decode();
 
-		console.log(`width: ${textureImg.width}, height: ${textureImg.height}`);
+		// console.log(`width: ${textureImg.width}, height: ${textureImg.height}`);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImg);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -106,8 +113,10 @@ export class Triangle {
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 
-	setupDrawingBuffers()
-	{
+	static setupDrawingBuffers() {
+		let points = getPoints();
+		let indices = getIndices();
+		let uvs = getUVS();
 		//create and bind VAO
 		if (myVAO == null) myVAO = gl.createVertexArray();
 		gl.bindVertexArray(myVAO);
@@ -143,16 +152,10 @@ export class Triangle {
 		gl.bindVertexArray(null);
 		gl.bindBuffer(gl.ARRAY_BUFFER, null);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-
-		// indicate a redraw is required.
-		updateDisplay = true;
 	}
 
-	renderTriangle()
-	{
-		// // Clear the scene
-		// gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		// gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+	static renderTriangle() {
+		let indices = getIndices();
 
 		// Bind the VAO
 		gl.bindVertexArray(myVAO);
@@ -173,7 +176,7 @@ export class Triangle {
 	}
 
 	static pushToTopTexture() {
-		// let uvs = getUVSArr();
+		let uvs = getUVS();
 		uvs.push(0.0);
 		uvs.push(1.0);
 		uvs.push(1.0);
@@ -183,7 +186,7 @@ export class Triangle {
 	}
 
 	static pushToBottomTexture() {
-		// let uvs = getUVSArr(); //todo
+		let uvs = getUVS();
 		uvs.push(0.0);
 		uvs.push(1.0);
 		uvs.push(0.0);

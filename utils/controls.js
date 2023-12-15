@@ -1,4 +1,4 @@
-import { createNewShape, draw } from "../tessMain.js";
+import { createScene } from "../tessMain.js";
 
 const anglesReset = [0.0, 0.0, 0.0];
 let angles = [...anglesReset];
@@ -7,13 +7,12 @@ let angleInc = 5.0;
 const translationsReset = [0.0, 0.0, 0.25];
 let translations = [...translationsReset];
 let translationInc = 0.05;
-const translationMinZ = 0;
+const translationMinZ = 0; //todo
 
 export const getAngles = () => angles;
 export const getTranslations = () => translations;
 
 export function gotKey(event) {
-
 	let key = event.key;
 	let angleIndex = 0;
 	let angleIncVal = 0;
@@ -77,14 +76,12 @@ export function gotKey(event) {
 			translations = [...translationsReset];
 			break;
 	}
-	// console.log(translations[2]); //TODO remove this print
 	angles[angleIndex] += angleIncVal;
 	translations[translationIndex] += translationIncVal;
 	if (translations[2] < translationInc) {
 		translations[2] = translationInc;
 	}
 
-	// Create a new shape and do a redo a draw
-	createNewShape();
-	draw();
+	// Draw the updated scene
+	createScene();
 }

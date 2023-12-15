@@ -5,7 +5,6 @@ import { fragmentshader } from "./shaders/fragmentshader.gsls.js";
 import { vertexshader } from "./shaders/vertexshader.gsls.js";
 import { getAngles, getTranslations, gotKey } from "./utils/controls.js";
 import { LimbType } from "./models/limbtype.js";
-import { Triangle } from "./models/triangle.js"; //todo remove
 import { genRandValue } from "./utils/utils.js";
 import { Limb } from "./models/limb.js";
 
@@ -14,18 +13,15 @@ let canvas;
 export let gl, program;
 
 let dirtTexture;
+let uvs = [], indices = [], points = [];
 
-// // VAO stuff
-// var myVAO = null;
-// var myVertexBuffer = null;
-// var myBaryBuffer = null;
-// var myUVBuffer = null;
-// var myIndexBuffer = null;
+export const getUVS = () => uvs;
+export const getIndices = () => indices;
+export const getPoints = () => points;
 
 // Other globals with default values;
 var division1 = 10;
 var division2 = 4;
-var updateDisplay = true;
 
 // Setting up where the objects are displayed
 let dimForGround = { x: 1,y: 1, z: 1 };
@@ -57,12 +53,24 @@ Limb.decideLimbs(LimbType.Branch, branchOffsets, .1, cylinderNumTriangles, .30)
 const hemisphereStart = Math.round(hemisphereNumTriangles * .10);
 const cylinderStart = Math.round(cylinderNumTriangles * .70) + division1;
 
+export function createScene() {
+    // Clear the scene
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    // bool flag to determine when to draw branches/roots
+    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart, "dirt3.jpg");
+    // const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart, "dirt.jpg");
+
+    // Limb.drawLimbs(roots);
+    // Limb.drawLimbs(branches);
+
+    Triangle.renderBuffer();
+}
+
 // Given an id, extract the content's of a shader script
 // from the DOM and return the compiled shader
 function getShader(shadertype, shaderString) {
-    // const script = document.getElementById(id);
-    // const shaderString = script.text.trim();
-
     // Assign shader depending on the type of shader
     let shader;
     if (shadertype === "vertex-shader") {
@@ -113,124 +121,7 @@ function initProgram() {
     program.uTheta = gl.getUniformLocation(program, "theta");
     program.uTranslation = gl.getUniformLocation(program, "translation");
 
-    // set up textures
-    // dirtTexture = gl.createTexture();
-    // const dirtImg = new Image();
-
-    // (async () => {
-    //     dirtImg.src = "./shaders/dirt3.jpg";
-    //     await dirtImg.decode();
-
-    //     console.log(`width: ${dirtImg.width}, height: ${dirtImg.height}`);
-    //     gl.bindTexture(gl.TEXTURE_2D, dirtTexture);
-    //     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, dirtImg);
-    //     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    //     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    //     gl.bindTexture(gl.TEXTURE_2D, null);
-
-    //     // createNewShape();
-
-    //     // do a draw
-    //     // draw();
-    // })();
     createScene();
-}
-
-function createScene() {
-    // Clear the scene
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    // bool flag to determine when to draw branches/roots
-    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart, "dirt3.jpg");
-    const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart, "dirt3.jpg");
-
-    // Limb.drawLimbs(roots);
-    // Limb.drawLimbs(branches);
-
-    // Test triangle
-    // var test = Triangle.create(
-    //     [
-    //         0.0, 0.0, 0.0, // y
-    //         1.0, 0.0, 0.0,
-    //         0.0, 0.0, 1.0 // towards us
-    //     ])
-    // test.draw()
-}
-
-// general call to make and bind a new object based on current
-// settings..Basically a call to shape specfic calls in cgIshape.js
-export function createNewShape() {
-    // clear your points and elements
-    points = [];
-    indices = [];
-    bary = [];
-    uvs = [];
-
-    createScene();
-
-    //create and bind VAO
-    if (myVAO == null) myVAO = gl.createVertexArray();
-    gl.bindVertexArray(myVAO);
-
-    // create and bind vertex buffer
-    if (myVertexBuffer == null) myVertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, myVertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(program.aVertexPosition);
-    gl.vertexAttribPointer(program.aVertexPosition, 4, gl.FLOAT, false, 0, 0);
-
-    if (myUVBuffer == null) myUVBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, myUVBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uvs), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(program.aVertexTextureCoords);
-    // note that texture uv's are 2d, which is why there's a 2 below
-    gl.vertexAttribPointer(program.aVertexTextureCoords, 2, gl.FLOAT, false, 0, 0);
-
-    // uniform values
-    gl.uniform3fv(program.uTheta, new Float32Array(getAngles()));
-    gl.uniform3fv(program.uTranslation, new Float32Array(getTranslations()));
-
-    // Setting up the IBO
-    if (myIndexBuffer == null) myIndexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, myIndexBuffer);
-    gl.bufferData(
-        gl.ELEMENT_ARRAY_BUFFER,
-        new Uint16Array(indices),
-        gl.STATIC_DRAW
-    );
-
-    // Clean
-    gl.bindVertexArray(null);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-
-    // indicate a redraw is required.
-    updateDisplay = true;
-}
-
-// We call draw to render to our canvas
-export function draw() {
-    // Clear the scene
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-    // Bind the VAO
-    gl.bindVertexArray(myVAO);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, myIndexBuffer);
-
-    // bind the texture
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, dirtTexture);
-    gl.uniform1i(program.uSampler, 0);
-
-    // Draw to the scene using triangle primitives
-    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
-
-    // Clean
-    gl.bindVertexArray(null);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 }
 
 // Entry point to our application
@@ -251,8 +142,8 @@ function init() {
 
     // Retrieve a WebGL context
     gl = canvas.getContext("webgl2");
-    // Set the clear color to be black
-    gl.clearColor(0, 0, 0, 1);
+    // Set the clear color
+    gl.clearColor(50/255, 151/255, 168/255, 1);
 
     // some GL initialization
     gl.enable(gl.DEPTH_TEST);
@@ -260,18 +151,12 @@ function init() {
 
     gl.cullFace(gl.BACK);
     gl.frontFace(gl.CCW);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    // gl.clearColor(0.0, 0.0, 0.0, 1.0); todo
     gl.depthFunc(gl.LEQUAL);
     gl.clearDepth(1.0);
 
     // Read, compile, and link your shaders
     initProgram();
-
-    // create and bind your current object
-    // createNewShape();
-
-    // // do a draw
-    // draw();
 }
 
 init();
