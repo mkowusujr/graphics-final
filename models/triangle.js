@@ -1,5 +1,18 @@
 import { Point } from "./point.js";
-import { getBaryArr, getUVSArr, getIndices, getPointsArr } from "../tessMain.js";
+import { gl, program } from "../tessMain.js";
+import { getAngles, getTranslations, gotKey } from "../utils/controls.js";
+let uvs = [], indices = [], points = [];
+
+// VAO stuff
+var myVAO = null;
+var myVertexBuffer = null;
+var myBaryBuffer = null;
+var myUVBuffer = null;
+var myIndexBuffer = null;
+
+let texture
+var updateDisplay = true;
+
 export class Triangle {
 	constructor(point0, point1, point2) {
 		this.point0 = point0;
@@ -27,12 +40,31 @@ export class Triangle {
 		return new Triangle(p0, p1, p2);
 	}
 
-	draw() {
-		let points = getPointsArr();
-		let bary = getBaryArr();
-		// let uvs = getUVSArr();
-		let indices = getIndices();
+	draw(texturePos, textureFile)
+	{
+		textureFile = "./shaders/" + textureFile;
+		console.log(textureFile);
+		(async () => {
+			switch (texturePos) {
+				case "TOP":
+					Triangle.pushToTopTexture();
+					break;
+				case "BOTTOM":
+					Triangle.pushToBottomTexture();
+					break;
+				case "BOTH":
+					Triangle.pushToBothTexture();
+					break;
+			}
 
+			await this.setupTextures(textureFile);
+			this.setupDataBuffers();
+			this.setupDrawingBuffers();
+			this.renderTriangle();
+		})();
+	}
+
+	setupDataBuffers() {
 		let nverts = points.length / 4;
 		const coords = [
 			this.point0.toList(), //[x0, y0, z0],
@@ -49,7 +81,7 @@ export class Triangle {
 		for (let i = 0; i < dim.length; i++) {
 			for (let j = 0; j < dim[i].length; j++) {
 				points.push(coords[i][j]);
-				bary.push(dim[i][j]);
+				// bary.push(dim[i][j]);
 				// uvs.push(dim[i][j]);
 			}
 			points.push(1);
@@ -58,8 +90,90 @@ export class Triangle {
 		}
 	}
 
+	async setupTextures(textureFile)
+	{
+		texture = gl.createTexture();
+		const textureImg = new Image();
+
+		textureImg.src = textureFile;
+		await textureImg.decode();
+
+		console.log(`width: ${textureImg.width}, height: ${textureImg.height}`);
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImg);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+	}
+
+	setupDrawingBuffers()
+	{
+		//create and bind VAO
+		if (myVAO == null) myVAO = gl.createVertexArray();
+		gl.bindVertexArray(myVAO);
+
+		// create and bind vertex buffer
+		if (myVertexBuffer == null) myVertexBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, myVertexBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW);
+		gl.enableVertexAttribArray(program.aVertexPosition);
+		gl.vertexAttribPointer(program.aVertexPosition, 4, gl.FLOAT, false, 0, 0);
+
+		if (myUVBuffer == null) myUVBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, myUVBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uvs), gl.STATIC_DRAW);
+		gl.enableVertexAttribArray(program.aVertexTextureCoords);
+		// note that texture uv's are 2d, which is why there's a 2 below
+		gl.vertexAttribPointer(program.aVertexTextureCoords, 2, gl.FLOAT, false, 0, 0);
+
+		// uniform values
+		gl.uniform3fv(program.uTheta, new Float32Array(getAngles()));
+		gl.uniform3fv(program.uTranslation, new Float32Array(getTranslations()));
+
+		// Setting up the IBO
+		if (myIndexBuffer == null) myIndexBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, myIndexBuffer);
+		gl.bufferData(
+			gl.ELEMENT_ARRAY_BUFFER,
+			new Uint16Array(indices),
+			gl.STATIC_DRAW
+		);
+
+		// Clean
+		gl.bindVertexArray(null);
+		gl.bindBuffer(gl.ARRAY_BUFFER, null);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+		// indicate a redraw is required.
+		updateDisplay = true;
+	}
+
+	renderTriangle()
+	{
+		// // Clear the scene
+		// gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		// gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+		// Bind the VAO
+		gl.bindVertexArray(myVAO);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, myIndexBuffer);
+
+		// bind the texture
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.uniform1i(program.uSampler, 0);
+
+		// Draw to the scene using triangle primitives
+		gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+
+		// Clean
+		gl.bindVertexArray(null);
+		gl.bindBuffer(gl.ARRAY_BUFFER, null);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	}
+
 	static pushToTopTexture() {
-		let uvs = getUVSArr();
+		// let uvs = getUVSArr();
 		uvs.push(0.0);
 		uvs.push(1.0);
 		uvs.push(1.0);
@@ -69,7 +183,7 @@ export class Triangle {
 	}
 
 	static pushToBottomTexture() {
-		let uvs = getUVSArr();
+		// let uvs = getUVSArr(); //todo
 		uvs.push(0.0);
 		uvs.push(1.0);
 		uvs.push(0.0);

@@ -10,21 +10,17 @@ import { genRandValue } from "./utils/utils.js";
 import { Limb } from "./models/limb.js";
 
 // Global variables that are set and used across the application
-let gl, program, points, bary, uvs, indices, canvas;
+let canvas;
+export let gl, program;
 
 let dirtTexture;
 
-export const getPointsArr = () => points;
-export const getBaryArr = () => bary;
-export const getUVSArr = () => uvs;
-export const getIndices = () => indices;
-
-// VAO stuff
-var myVAO = null;
-var myVertexBuffer = null;
-var myBaryBuffer = null;
-var myUVBuffer = null;
-var myIndexBuffer = null;
+// // VAO stuff
+// var myVAO = null;
+// var myVertexBuffer = null;
+// var myBaryBuffer = null;
+// var myUVBuffer = null;
+// var myIndexBuffer = null;
 
 // Other globals with default values;
 var division1 = 10;
@@ -50,16 +46,16 @@ let originForTrunk = Point.create([
     originForGround.z + randZ,
 ]);
 const hemisphereNumTriangles = (division2 - 1) * division1 * 2 + division1;
-console.log(hemisphereNumTriangles);
-const cylinderNumTriangles = -1;
+
+const cylinderNumTriangles = division2 * division1 * 2;
+
 let rootOffsets = []
+let branchOffsets = []
+
 Limb.decideLimbs(LimbType.Root, rootOffsets, .1, hemisphereNumTriangles, .30)
+Limb.decideLimbs(LimbType.Branch, branchOffsets, .1, cylinderNumTriangles, .30)
 const hemisphereStart = Math.round(hemisphereNumTriangles * .10);
-
-// let rootShifts = []; //todo ask matt to help rethink this array, it seems hard
-// //todo probable make a roots class to hold all of this complicated data
-// DecideLimbs(LimbType.Root, roots, rootShifts, 0.1, hemisphereNumTriangles, 0.3)
-
+const cylinderStart = Math.round(cylinderNumTriangles * .70) + division1;
 
 // Given an id, extract the content's of a shader script
 // from the DOM and return the compiled shader
@@ -118,42 +114,39 @@ function initProgram() {
     program.uTranslation = gl.getUniformLocation(program, "translation");
 
     // set up textures
-    dirtTexture = gl.createTexture();
-    const dirtImg = new Image();
+    // dirtTexture = gl.createTexture();
+    // const dirtImg = new Image();
 
-    (async () => {
-        dirtImg.src = "./shaders/dirt3.jpg";
-        await dirtImg.decode();
+    // (async () => {
+    //     dirtImg.src = "./shaders/dirt3.jpg";
+    //     await dirtImg.decode();
 
-        console.log(`width: ${dirtImg.width}, height: ${dirtImg.height}`);
-        gl.bindTexture(gl.TEXTURE_2D, dirtTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, dirtImg);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.bindTexture(gl.TEXTURE_2D, null);
+    //     console.log(`width: ${dirtImg.width}, height: ${dirtImg.height}`);
+    //     gl.bindTexture(gl.TEXTURE_2D, dirtTexture);
+    //     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, dirtImg);
+    //     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    //     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    //     gl.bindTexture(gl.TEXTURE_2D, null);
 
-        createNewShape();
+    //     // createNewShape();
 
-        // do a draw
-        draw();
-    })();
+    //     // do a draw
+    //     // draw();
+    // })();
+    createScene();
 }
 
-// async function bindTextureThenRun()
-// {
-    
-// }
-
 function createScene() {
-    // bool flag to determine when to draw branches/roots
-    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart);
-    // makeCylinder(division1, division2, originForTrunk, dimForTrunk);
+    // Clear the scene
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-    Limb.drawLimbs(roots);
-    // makeLimbs(trianglesForBranches, LimbType.Branch);
-    // console.log(rootTriangles) //todo delete
-    // console.log(rootShifts) //todo delete
-    // makeLimbs(rootTriangles, rootShifts);
+    // bool flag to determine when to draw branches/roots
+    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart, "dirt3.jpg");
+    const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart, "dirt3.jpg");
+
+    // Limb.drawLimbs(roots);
+    // Limb.drawLimbs(branches);
 
     // Test triangle
     // var test = Triangle.create(
@@ -163,7 +156,6 @@ function createScene() {
     //         0.0, 0.0, 1.0 // towards us
     //     ])
     // test.draw()
-    // makeLimbs([test], LimbType.Root, rootShifts);
 }
 
 // general call to make and bind a new object based on current
@@ -188,13 +180,6 @@ export function createNewShape() {
     gl.enableVertexAttribArray(program.aVertexPosition);
     gl.vertexAttribPointer(program.aVertexPosition, 4, gl.FLOAT, false, 0, 0);
 
-    // // create and bind bary buffer
-    // if (myBaryBuffer == null) myBaryBuffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ARRAY_BUFFER, myBaryBuffer);
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bary), gl.STATIC_DRAW);
-    // gl.enableVertexAttribArray(program.aBary);
-    // gl.vertexAttribPointer(program.aBary, 3, gl.FLOAT, false, 0, 0);
-    // create and bind uv buffer
     if (myUVBuffer == null) myUVBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, myUVBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uvs), gl.STATIC_DRAW);

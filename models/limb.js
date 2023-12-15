@@ -94,8 +94,7 @@ export class Limb {
         return offsetArray;
     }
 
-    //todo probably decide num segments here too, each section always goes out in the same dir
-    //todo clean up like everything :(
+    //todo each section always goes out in the same dir
     /**
      * Decide which triangles will become limbs
      * @param {*} limbType Enum of Root or Branch, determines if yShift is +/-
