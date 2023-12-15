@@ -1,9 +1,10 @@
 "use strict";
 import { makeCylinder, makeHemisphere } from "./utils/shapes.js";
 import { Point } from "./models/point.js";
+import { Triangle } from "./models/triangle.js";
 import { fragmentshader } from "./shaders/fragmentshader.gsls.js";
 import { vertexshader } from "./shaders/vertexshader.gsls.js";
-import { getAngles, getTranslations, gotKey } from "./utils/controls.js";
+import { gotKey } from "./utils/controls.js";
 import { LimbType } from "./models/limbtype.js";
 import { genRandValue } from "./utils/utils.js";
 import { Limb } from "./models/limb.js";
@@ -18,6 +19,11 @@ let uvs = [], indices = [], points = [];
 export const getUVS = () => uvs;
 export const getIndices = () => indices;
 export const getPoints = () => points;
+export function clearDataArrs(){
+    uvs = [];
+    indices = [];
+    points = [];
+}
 
 // Other globals with default values;
 var division1 = 10;
@@ -58,14 +64,11 @@ export function createScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-    // bool flag to determine when to draw branches/roots
-    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart, "dirt3.jpg");
-    // const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart, "dirt.jpg");
+    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart, "./shaders/dirt3.jpg");
+    const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart, "./shaders/bark.jpg");
 
     // Limb.drawLimbs(roots);
-    // Limb.drawLimbs(branches);
-
-    Triangle.renderBuffer();
+    // Limb.drawLimbs(branches); //todo remember to set texture at beginning, draw at end and remove texture at end
 }
 
 // Given an id, extract the content's of a shader script
@@ -120,18 +123,6 @@ function initProgram() {
     program.aBary = gl.getAttribLocation(program, "bary");
     program.uTheta = gl.getUniformLocation(program, "theta");
     program.uTranslation = gl.getUniformLocation(program, "translation");
-
-    createScene();
-}
-
-// general call to make and bind a new object based on current
-// settings..Basically a call to shape specfic calls in cgIshape.js
-export function createNewShape() {
-    // clear your points and elements
-    points = [];
-    indices = [];
-    bary = [];
-    uvs = [];
 
     createScene();
 }

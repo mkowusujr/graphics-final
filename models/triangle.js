@@ -1,19 +1,17 @@
 import { Point } from "./point.js";
 import { gl, program } from "../tessMain.js";
-import { getAngles, getTranslations, gotKey } from "../utils/controls.js";
-// let uvs = [], indices = [], points = [];
-import { getIndices, getPoints, getUVS } from "../tessMain.js";
+import { getAngles, getTranslations } from "../utils/controls.js";
+import { getIndices, getPoints, getUVS, clearDataArrs } from "../tessMain.js";
 // VAO stuff
 var myVAO = null;
 var myVertexBuffer = null;
-var myBaryBuffer = null;
 var myUVBuffer = null;
 var myIndexBuffer = null;
 
-let texture
 
 export class Triangle {
-	constructor(point0, point1, point2) { //todo add texture as a field
+	static texture;
+	constructor(point0, point1, point2) {
 		this.point0 = point0;
 		this.point1 = point1;
 		this.point2 = point2;
@@ -39,42 +37,32 @@ export class Triangle {
 		return new Triangle(p0, p1, p2);
 	}
 
-	draw(texturePos, textureFile) {
+	draw(texturePos) {
 		let points = getPoints();
-		textureFile = "./shaders/" + textureFile;
-	
-		(async () => {
-			switch (texturePos) {
-				case "TOP":
-					Triangle.pushToTopTexture();
-					break;
-				case "BOTTOM":
-					Triangle.pushToBottomTexture();
-					break;
-				case "BOTH":
-					Triangle.pushToBothTexture();
-					break;
-			}
-
-			await this.setupTextures(textureFile);
-			this.setupDataBuffers();
-			if(points.length >= 1000 * 3){
-				Triangle.renderBuffer();
-			}
-		})();
+		switch (texturePos) {
+			case "TOP":
+				Triangle.pushToTopTexture();
+				break;
+			case "BOTTOM":
+				Triangle.pushToBottomTexture();
+				break;
+			case "BOTH":
+				Triangle.pushToBothTexture();
+				break;
+		}
+		this.setupDataBuffers();
+		if(points.length >= 1000 * 3){
+			Triangle.renderBuffer();
+		}
 	}
 
 	static renderBuffer() {
-		let points = getPoints();
-		let indices = getIndices();
-		let uvs = getUVS();
+		Triangle.setupTexture();
 		Triangle.setupDrawingBuffers();
 		Triangle.renderTriangle();
-		points = [];
 		
-		indices = [];
-		
-		uvs = [];
+		clearDataArrs();
+		Triangle.clearTextureBuffer();
 	}
 
 	setupDataBuffers() {
@@ -98,18 +86,22 @@ export class Triangle {
 		}
 	}
 
-	async setupTextures(textureFile) {
-		texture = gl.createTexture();
+	 static async setupTexture(textureFile) {
+		Triangle.texture = gl.createTexture();
 		const textureImg = new Image();
 
-		textureImg.src = textureFile;
+		 textureImg.src = textureFile;
+		 console.log(textureImg.src)
 		await textureImg.decode();
 
-		// console.log(`width: ${textureImg.width}, height: ${textureImg.height}`);
-		gl.bindTexture(gl.TEXTURE_2D, texture);
+		// console.log(`width: ${textureImg.width}, height: ${textureImg.height}`); //todo remove
+		gl.bindTexture(gl.TEXTURE_2D, Triangle.texture);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImg);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	}
+	
+	static clearTextureBuffer(){
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 
@@ -163,7 +155,7 @@ export class Triangle {
 
 		// bind the texture
 		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.bindTexture(gl.TEXTURE_2D, Triangle.texture);
 		gl.uniform1i(program.uSampler, 0);
 
 		// Draw to the scene using triangle primitives
