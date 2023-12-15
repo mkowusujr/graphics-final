@@ -50,11 +50,16 @@ let originForTrunk = Point.create([
     originForGround.z + randZ,
 ]);
 const hemisphereNumTriangles = (division2 - 1) * division1 * 2 + division1;
-console.log(hemisphereNumTriangles);
-const cylinderNumTriangles = -1;
+
+const cylinderNumTriangles = division2 * division1 * 2;
+
 let rootOffsets = []
+let branchOffsets = []
+
 Limb.decideLimbs(LimbType.Root, rootOffsets, .1, hemisphereNumTriangles, .30)
+Limb.decideLimbs(LimbType.Branch, branchOffsets, .1, cylinderNumTriangles, .30)
 const hemisphereStart = Math.round(hemisphereNumTriangles * .10);
+const cylinderStart = Math.round(cylinderNumTriangles * .70) + division1;
 
 // let rootShifts = []; //todo ask matt to help rethink this array, it seems hard
 // //todo probable make a roots class to hold all of this complicated data
@@ -146,10 +151,10 @@ function initProgram() {
 
 function createScene() {
     // bool flag to determine when to draw branches/roots
-    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart);
-    // makeCylinder(division1, division2, originForTrunk, dimForTrunk);
+    // const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart);
+    makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart);
 
-    Limb.drawLimbs(roots);
+    // Limb.drawLimbs(roots);
     // makeLimbs(trianglesForBranches, LimbType.Branch);
     // console.log(rootTriangles) //todo delete
     // console.log(rootShifts) //todo delete

@@ -19,49 +19,65 @@ export let trianglesForRoots = []
  * @param {*} origin Point object of the hemisphere's origin point
  * @param {*} dim Map of scalars for x, y, & z
  */ //todo add the branches input array and return the branch triangle array
-export function makeCylinder(radialdivision, heightdivision, origin, dim) {
+export function makeCylinder(radialdivision, heightdivision, origin, dim, branchOffset, cylinderStart) {
+    let counter = 0; //todo rename?
+    let branches = []; //todo rename?
+    
     heightdivision = heightdivision < 1 ? 1 : heightdivision;
     radialdivision = radialdivision < 3 ? 3 : radialdivision;
     const r = { x: dim.x / 2, y: dim.y / 2, z: dim.z / 2 };
     const t = 1 / heightdivision;
     const beta = 2 * pi / radialdivision;
+    let x0, x1, z0, z1;
 
-    for (let i = 0; i < radialdivision; i++) {
-        const theta0 = i * beta;
-        const theta1 = theta0 + beta;
-        const x0 = origin.x + r.x * sin(theta0);
-        const z0 = origin.z + r.z * cos(theta0);
-        const x1 = origin.x + r.x * sin(theta1);
-        const z1 = origin.z + r.z * cos(theta1);
+    for (let u = -1; u <= heightdivision; u++) {
+        let y0 = origin.y - r.y + u * t;
+        let y1 = y0 + t;
 
-        for (let u = 0; u < heightdivision; u++) {
-            let y0 = origin.y + - r.y + u * t;
-            let y1 = y0 + t;
+        for (let i = 0; i < radialdivision; i++) {
+            const theta0 = i * beta;
+            const theta1 = theta0 + beta;
+            x0 = origin.x + r.x * sin(theta0);
+            z0 = origin.z + r.z * cos(theta0);
+            x1 = origin.x + r.x * sin(theta1);
+            z1 = origin.z + r.z * cos(theta1);
 
-            let triangle1 = Triangle.create([
-                    x0, y0, z0,
-                    x0, y1, z0,
-                    x1, y0, z1]);
-            let triangle2 = Triangle.create([
-                    x1, y1, z1,
-                    x1, y0, z1,
-                    x0, y1, z0]);
-
-            let decisionFactor = 0.15
-            let triangles = { t1: triangle1, t2: triangle2 }
-        }
-
-        // // Draw Top Face
-        Triangle.create([
-                x1, origin.y - r.y, z1,
-                origin.x, origin.y - r.y, origin.z,
-                x0, origin.y - r.y, z0]).draw();
-
-        // // Draw Bottom Face
-        Triangle.create([
+            if (u == -1)
+            {
+                // Draw Bottom Face
+                let tBottom = Triangle.create([
+                    x0, origin.y - r.y, z0,
+                    x1, origin.y - r.y, z1,
+                origin.x, origin.y - r.y, origin.z]);
+            
+                counter = checkDraw(counter, branches, branchOffset, tBottom, cylinderStart, TexturePos.BOTTOM);
+            } 
+            else if (u == heightdivision)
+            {
+                // Draw Top Face
+                let tTop = Triangle.create([
+                    origin.x, origin.y + r.y, origin.z,
                 x1, origin.y + r.y, z1,
-                x0, origin.y + r.y, z0,
-                origin.x, origin.y + r.y, origin.z]).draw();
+                x0, origin.y + r.y, z0]);
+                counter = checkDraw(counter, branches, branchOffset, tTop, cylinderStart, TexturePos.TOP);
+            }
+            else 
+            {
+                let triangle1 = Triangle.create([
+                        x0, y0, z0,
+                        x0, y1, z0,
+                        x1, y0, z1]);
+                
+                counter = checkDraw(counter, branches, branchOffset, triangle1, cylinderStart, TexturePos.TOP);
+    
+                let triangle2 = Triangle.create([
+                        x1, y1, z1,
+                        x1, y0, z1,
+                        x0, y1, z0]);
+                
+                counter = checkDraw(counter, branches, branchOffset, triangle2, cylinderStart, TexturePos.BOTTOM);
+            }
+        }
     }
 }
 
