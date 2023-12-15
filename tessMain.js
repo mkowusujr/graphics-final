@@ -124,6 +124,45 @@ function initProgram() {
     createScene();
 }
 
+// async function bindTextureThenRun()
+// {
+    
+// }
+
+function createScene() {
+    // bool flag to determine when to draw branches/roots
+    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart);
+    // makeCylinder(division1, division2, originForTrunk, dimForTrunk);
+
+    Limb.drawLimbs(roots);
+    // makeLimbs(trianglesForBranches, LimbType.Branch);
+    // console.log(rootTriangles) //todo delete
+    // console.log(rootShifts) //todo delete
+    // makeLimbs(rootTriangles, rootShifts);
+
+    // Test triangle
+    // var test = Triangle.create(
+    //     [
+    //         0.0, 0.0, 0.0, // y
+    //         1.0, 0.0, 0.0,
+    //         0.0, 0.0, 1.0 // towards us
+    //     ])
+    // test.draw()
+    // makeLimbs([test], LimbType.Root, rootShifts);
+}
+
+// general call to make and bind a new object based on current
+// settings..Basically a call to shape specfic calls in cgIshape.js
+export function createNewShape() {
+    // clear your points and elements
+    points = [];
+    indices = [];
+    bary = [];
+    uvs = [];
+
+    createScene();
+}
+
 // Entry point to our application
 function init() {
     // Retrieve the canvas
