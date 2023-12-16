@@ -1,9 +1,8 @@
 import { Triangle } from "../models/triangle.js";
-import { Point } from "../models/point.js";
-import { LimbType } from "../models/limbtype.js";
 import { Limb } from "../models/limb.js"
 import { TexturePos } from "../models/texturepos.js";
 import { getPoints } from "../tessMain.js";
+import { Point } from "../models/point.js";
 const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);
 let cos = (theta) => Math.cos(theta);
@@ -12,14 +11,14 @@ let cos = (theta) => Math.cos(theta);
  * Creates a cylinder centered at origin.x, y, z,
  * with radial divisions and vertical divisions.
  * Dim affects the stretch of the object in the x, y, & z directions seperately
- * @param {*} radialdivision Vertical divisions
- * @param {*} heightdivision Horizontal divisions
- * @param {*} origin Point object of the hemisphere's origin point
- * @param {*} dim Map of scalars for x, y, & z
- * @param {*} branchOffsets Array of if a triangle should be added to the return array
- * @param {*} cylinderStart First index where a branch can appear
- * @param {*} texture Texture to map to the triangles
- * @returns Array of limb objects to draw as branches
+ * @param {Number} radialdivision Vertical divisions
+ * @param {Number} heightdivision Horizontal divisions
+ * @param {Point} origin Cylinder's origin
+ * @param {Map<Symbol, Number>} dim Scalars for x, y, & z
+ * @param {Array<Array<Point>|null>} branchOffsets Array of if a triangle should be added to the return array
+ * @param {Number} cylinderStart First index where a branch can appear
+ * @param {String} texture Texture to map to the triangles
+ * @returns {Array<Limb>} Array of limb objects to draw as branches
  */
 export function makeCylinder(radialdivision, heightdivision, origin, dim, branchOffsets, cylinderStart, texture) {
     // console.log("start" + getPoints())
@@ -93,14 +92,14 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim, branch
  * Creates a hemisphere centered at origin.x, y, z,
  * with slices vertical sub-divisions and stacks horizontal sub-divisions.
  * Dim affects the stretch of the object in the x, y, & z directions seperately
- * @param {*} slices Vertical slices
- * @param {*} stacks Horizontal slices
- * @param {*} origin Point object of the hemisphere's origin point
- * @param {*} dim Map of scalars for x, y, & z
- * @param {*} rootOffsets Array of if a triangle should be added to the return array
- * @param {*} hemisphereStart First index where a root can appear
- * @param {*} texture Texture to map to the triangles
- * @returns Array of limb objects to draw as roots
+ * @param {Number} slices Vertical slices
+ * @param {Number} stacks Horizontal slices
+ * @param {Point} origin Hemisphere's origin
+ * @param {Map<Symbol, Number>} dim Map of scalars for x, y, & z
+ * @param {Array<Array<Point>|null>} rootOffsets Array of if a triangle should be added to the return array
+ * @param {Number} hemisphereStart First index where a root can appear
+ * @param {String} texture Texture to map to the triangles
+ * @returns {Array<Limb>} Array of limb objects to draw as roots
  */
 export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisphereStart, texture) {
     Triangle.setupTexture(texture);
@@ -162,13 +161,13 @@ export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisph
 
 /**
  * Calculates all current points for the hemisphere
- * @param {*} lat0 Current lat
- * @param {*} lat1 Next lat
- * @param {*} lon0 Current lon
- * @param {*} lon1 Next lon
- * @param {*} r Object's radius
- * @param {*} origin Point object of the hemisphere's origin point
- * @returns Map of 10 coordinates
+ * @param {Number} lat0 Current lat
+ * @param {Number} lat1 Next lat
+ * @param {Number} lon0 Current lon
+ * @param {Number} lon1 Next lon
+ * @param {Number} r Object's radius
+ * @param {Point} origin Hemisphere's origin
+ * @returns {Map<Symbol, Number>} 10 coordinates
  */
 function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim) {
     const rsinlat0 = r * sin(lat0);
@@ -198,13 +197,13 @@ function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim) {
  * Check if a triangle is supposed to be a limb or not,
  * if it is a limb, add it to the limbs array
  * if it is not a limb, draw it
- * @param {*} triangleIndex Index of the current triangle
- * @param {*} limbs Array of triangles that are limbs
- * @param {*} limbsDecide Array of if a triangle should be added to the limbs array (also contains limb offsets)
- * @param {*} t Triangle to add/draw
- * @param {*} startRange First index where a limb can appear
- * @param {*} texturePos Enum position of what points to push for the texture
- * @returns The updated index for the limbsDecide array
+ * @param {Number} triangleIndex Index of the current triangle
+ * @param {Array<Triangle>} limbs Triangles that are limbs
+ * @param {Array<Array<Point>|null>} limbsDecide Array of if a triangle should be added to the limbs array
+ * @param {Triangle} t Triangle to add/draw
+ * @param {Number} startRange First index where a limb can appear
+ * @param {Enumerator} texturePos Position of what points to push for the texture
+ * @returns {Number} The updated index for the limbsDecide array
  */
 function checkDraw(triangleIndex, limbs, limbsDecide, t, startRange, texturePos) {
     if (triangleIndex < startRange + limbsDecide.length && triangleIndex >= startRange) {
