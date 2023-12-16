@@ -68,9 +68,9 @@ export class Triangle {
 		let indices = getIndices();
 		let nverts = points.length / 4;
 		const coords = [
-			this.point0.toList(), //[x0, y0, z0],
-			this.point1.toList(), //[x1, y1, z1],
-			this.point2.toList(), //[x2, y2, z2],
+			this.point0.toArr(), //[x0, y0, z0],
+			this.point1.toArr(), //[x1, y1, z1],
+			this.point2.toArr(), //[x2, y2, z2],
 		];
 	
 		// Push all vertices
