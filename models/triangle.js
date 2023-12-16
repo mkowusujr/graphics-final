@@ -11,6 +11,8 @@ var myIndexBuffer = null;
 
 export class Triangle {
 	static texture;
+	static textures = [];
+
 	constructor(point0, point1, point2) {
 		this.point0 = point0;
 		this.point1 = point1;
@@ -37,7 +39,7 @@ export class Triangle {
 		return new Triangle(p0, p1, p2);
 	}
 
-	draw(texturePos) {
+	draw(texturePos, textureIndex) {
 		let points = getPoints();
 		switch (texturePos) {
 			case "TOP":
@@ -51,15 +53,15 @@ export class Triangle {
 				break;
 		}
 		this.setupDataBuffers();
-		if(points.length >= 1000 * 3){
-			Triangle.renderBuffer();
+		if (points.length >= 1000 * 3) {
+			Triangle.renderBuffer(textureIndex);
 		}
 	}
 
-	static renderBuffer() {
+	static renderBuffer(textureIndex) {
 		Triangle.setupDrawingBuffers();
-		Triangle.renderTriangle();
-		
+		Triangle.renderTriangle(textureIndex);
+
 		clearDataArrs();
 	}
 
@@ -72,7 +74,7 @@ export class Triangle {
 			this.point1.toArr(), //[x1, y1, z1],
 			this.point2.toArr(), //[x2, y2, z2],
 		];
-	
+
 		// Push all vertices
 		for (let i = 0; i < coords.length; i++) {
 			for (let j = 0; j < coords[i].length; j++) {
@@ -84,23 +86,21 @@ export class Triangle {
 		}
 	}
 
-	static async setupTexture(textureFile) {
-		Triangle.texture = gl.createTexture();
-		const textureImg = new Image();
+	static setupTexture(textureFile) {
+		(async () => {
+			let texture = gl.createTexture();
+			const textureImg = new Image();
 
-		 textureImg.src = textureFile;
-		 console.log(textureImg.src)
-		await textureImg.decode();
+			textureImg.src = textureFile;
+			await textureImg.decode();
 
-		// console.log(`width: ${textureImg.width}, height: ${textureImg.height}`); //todo remove
-		gl.bindTexture(gl.TEXTURE_2D, Triangle.texture);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImg);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-	}
-	
-	static clearTextureBuffer(){
-		gl.bindTexture(gl.TEXTURE_2D, null);
+			gl.bindTexture(gl.TEXTURE_2D, texture);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImg);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+
+			Triangle.textures.push(texture);
+		})();
 	}
 
 	static setupDrawingBuffers() {
@@ -144,8 +144,9 @@ export class Triangle {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 	}
 
-	static renderTriangle() {
+	static renderTriangle(textureIndex) {
 		let indices = getIndices();
+		// console.log(Triangle.texture)
 
 		// Bind the VAO
 		gl.bindVertexArray(myVAO);
@@ -153,7 +154,7 @@ export class Triangle {
 
 		// bind the texture
 		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, Triangle.texture);
+		gl.bindTexture(gl.TEXTURE_2D, Triangle.textures[textureIndex]);
 		gl.uniform1i(program.uSampler, 0);
 
 		// Draw to the scene using triangle primitives

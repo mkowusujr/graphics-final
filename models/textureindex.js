@@ -1,0 +1,1 @@
+export const TextureIndex = Object.freeze({ Bark: 0, Dirt: 1 });

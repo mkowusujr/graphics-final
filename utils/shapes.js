@@ -1,6 +1,7 @@
 import { Triangle } from "../models/triangle.js";
 import { Limb } from "../models/limb.js"
 import { TexturePos } from "../models/texturepos.js";
+import { TextureIndex } from "../models/textureindex.js";
 import { getPoints } from "../tessMain.js";
 import { Point } from "../models/point.js";
 const pi = Math.PI;
@@ -17,12 +18,9 @@ let cos = (theta) => Math.cos(theta);
  * @param {Map<Symbol, Number>} dim Scalars for x, y, & z
  * @param {Array<Array<Point>|null>} branchOffsets Array of if a triangle should be added to the return array
  * @param {Number} cylinderStart First index where a branch can appear
- * @param {String} texture Texture to map to the triangles
  * @returns {Array<Limb>} Array of limb objects to draw as branches
  */
-export function makeCylinder(radialdivision, heightdivision, origin, dim, branchOffsets, cylinderStart, texture) {
-    // console.log("start" + getPoints())
-    // Triangle.setupTexture(texture);
+export function makeCylinder(radialdivision, heightdivision, origin, dim, branchOffsets, cylinderStart) {
     let triangleIndex = 0;
     let branches = [];
     
@@ -53,7 +51,7 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim, branch
                     x1, origin.y - r.y, z1,
                 origin.x, origin.y - r.y, origin.z]);
             
-                triangleIndex = checkDraw(triangleIndex, branches, branchOffsets, tBottom, cylinderStart, TexturePos.BOTTOM);
+                triangleIndex = checkDraw(triangleIndex, branches, branchOffsets, tBottom, cylinderStart, TexturePos.BOTTOM, TextureIndex.Bark);
             } 
             else if (u == heightdivision)
             {
@@ -62,7 +60,7 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim, branch
                     origin.x, origin.y + r.y, origin.z,
                     x1, origin.y + r.y, z1,
                     x0, origin.y + r.y, z0]);
-                triangleIndex = checkDraw(triangleIndex, branches, branchOffsets, tTop, cylinderStart, TexturePos.TOP);
+                triangleIndex = checkDraw(triangleIndex, branches, branchOffsets, tTop, cylinderStart, TexturePos.TOP, TextureIndex.Bark);
             }
             else 
             {
@@ -71,20 +69,19 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim, branch
                         x0, y1, z0,
                         x1, y0, z1]);
                 
-                triangleIndex = checkDraw(triangleIndex, branches, branchOffsets, triangle1, cylinderStart, TexturePos.TOP);
+                triangleIndex = checkDraw(triangleIndex, branches, branchOffsets, triangle1, cylinderStart, TexturePos.TOP, TextureIndex.Bark);
     
                 let triangle2 = Triangle.create([
                         x1, y1, z1,
                         x1, y0, z1,
                         x0, y1, z0]);
                 
-                triangleIndex = checkDraw(triangleIndex, branches, branchOffsets, triangle2, cylinderStart, TexturePos.BOTTOM);
+                triangleIndex = checkDraw(triangleIndex, branches, branchOffsets, triangle2, cylinderStart, TexturePos.BOTTOM, TextureIndex.Bark);
             }
         } 
     }
-    console.log(getPoints())
-    Triangle.renderBuffer();
-    // Triangle.clearTextureBuffer();
+    
+    Triangle.renderBuffer(TextureIndex.Bark);
     return branches;
 }
 
@@ -98,12 +95,9 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim, branch
  * @param {Map<Symbol, Number>} dim Map of scalars for x, y, & z
  * @param {Array<Array<Point>|null>} rootOffsets Array of if a triangle should be added to the return array
  * @param {Number} hemisphereStart First index where a root can appear
- * @param {String} texture Texture to map to the triangles
  * @returns {Array<Limb>} Array of limb objects to draw as roots
  */
-export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisphereStart, texture) {
-    Triangle.setupTexture(texture);
-
+export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisphereStart) {
     let triangleIndex = 0;
     let roots = [];
 
@@ -128,14 +122,14 @@ export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisph
                         coords.x2, coords.y1, coords.z2,
                         origin.x, origin.y - r, origin.z,
                     coords.x3, coords.y1, coords.z3]);
-                triangleIndex = checkDraw(triangleIndex, roots, rootOffsets, t, hemisphereStart, TexturePos.BOTTOM);
+                triangleIndex = checkDraw(triangleIndex, roots, rootOffsets, t, hemisphereStart, TexturePos.BOTTOM, TextureIndex.Dirt);
 
             } else if (i == stacks) {
                 // Draw Base (Top)
                 Triangle.create([
                         coords.x1, coords.y0, coords.z1,
                         origin.x, origin.y, origin.z,
-                    coords.x0, coords.y0, coords.z0,]).draw(texture);
+                    coords.x0, coords.y0, coords.z0,]).draw(TexturePos.TOP, TextureIndex.Dirt);
                 Triangle.pushToTopTexture();
             } else {
                 // Draw Sides
@@ -143,19 +137,18 @@ export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisph
                         coords.x1, coords.y0, coords.z1,
                         coords.x3, coords.y1, coords.z3,
                         coords.x0, coords.y0, coords.z0]);
-                triangleIndex = checkDraw(triangleIndex, roots, rootOffsets, triangle1, hemisphereStart, TexturePos.TOP);
+                triangleIndex = checkDraw(triangleIndex, roots, rootOffsets, triangle1, hemisphereStart, TexturePos.TOP, TextureIndex.Dirt);
 
                 let triangle2 = Triangle.create([
                         coords.x2, coords.y1, coords.z2,
                         coords.x0, coords.y0, coords.z0,
                         coords.x3, coords.y1, coords.z3]);
-                triangleIndex = checkDraw(triangleIndex, roots, rootOffsets, triangle2, hemisphereStart, TexturePos.BOTTOM);
+                triangleIndex = checkDraw(triangleIndex, roots, rootOffsets, triangle2, hemisphereStart, TexturePos.BOTTOM, TextureIndex.Dirt);
             }
         }
     }
     
-    Triangle.renderBuffer();
-    Triangle.clearTextureBuffer();
+    Triangle.renderBuffer(TextureIndex.Dirt);
     return roots;
 }
 
@@ -205,19 +198,19 @@ function HemisphereCalculator(lat0, lat1, lon0, lon1, r, origin, dim) {
  * @param {Enumerator} texturePos Position of what points to push for the texture
  * @returns {Number} The updated index for the limbsDecide array
  */
-function checkDraw(triangleIndex, limbs, limbsDecide, t, startRange, texturePos) {
+function checkDraw(triangleIndex, limbs, limbsDecide, t, startRange, texturePos, textureIndex) {
     if (triangleIndex < startRange + limbsDecide.length && triangleIndex >= startRange) {
         if (limbsDecide[triangleIndex - startRange] !== null){
             let limb = new Limb(t, limbsDecide[triangleIndex - startRange]);
             limbs.push(limb);
         }
         else{
-            t.draw(texturePos);
+            t.draw(texturePos, textureIndex);
         }
         return triangleIndex + 1;
     }
     else{
-        t.draw(texturePos);
+        t.draw(texturePos, textureIndex);
     }
     return triangleIndex + 1;
 }

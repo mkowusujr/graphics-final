@@ -13,7 +13,6 @@ import { Limb } from "./models/limb.js";
 let canvas;
 export let gl, program;
 
-let dirtTexture;
 let uvs = [], indices = [], points = [];
 
 export const getUVS = () => uvs;
@@ -26,8 +25,8 @@ export function clearDataArrs(){
 }
 
 // Other globals with default values;
-var division1 = 10;
-var division2 = 4;
+var division1 = 20;
+var division2 = 10;
 
 // Setting up where the objects are displayed
 let dimForGround = { x: 1,y: 1, z: 1 };
@@ -47,6 +46,7 @@ let originForTrunk = Point.create([
     originForGround.y + dimForTrunk.y / 2,
     originForGround.z + randZ,
 ]);
+
 const hemisphereNumTriangles = (division2 - 1) * division1 * 2 + division1;
 
 const cylinderNumTriangles = division2 * division1 * 2;
@@ -59,16 +59,20 @@ Limb.decideLimbs(LimbType.Branch, branchOffsets, .1, cylinderNumTriangles, .30)
 const hemisphereStart = Math.round(hemisphereNumTriangles * .10);
 const cylinderStart = Math.round(cylinderNumTriangles * .70) + division1;
 
+
+
 export function createScene() {
     // Clear the scene
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    
+    
+    
+    const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart);
+    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart);
 
-    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart, "./shaders/dirt3.jpg");
-    const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart, "./shaders/bark.jpg");
-
-    Limb.drawLimbs(roots, );
-    Limb.drawLimbs(branches, ); //todo remember to set texture at beginning, draw at end and remove texture at end
+    // Limb.drawLimbs(roots, );
+    // Limb.drawLimbs(branches, ); //todo remember to set texture at beginning, draw at end and remove texture at end
 }
 
 // Given an id, extract the content's of a shader script
@@ -157,6 +161,10 @@ function init() {
     // gl.clearColor(0.0, 0.0, 0.0, 1.0); todo
     gl.depthFunc(gl.LEQUAL);
     gl.clearDepth(1.0);
+
+    // init textures
+    Triangle.setupTexture("./shaders/bark.jpg");
+    Triangle.setupTexture("./shaders/dirt3.jpg");
 
     // Read, compile, and link your shaders
     initProgram();

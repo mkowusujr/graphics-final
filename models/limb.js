@@ -2,6 +2,7 @@ import { genRandValue } from "../utils/utils.js"
 import { Point } from "./point.js";
 import { Triangle } from "./triangle.js";
 import { TexturePos } from "./texturepos.js";
+import { TextureIndex } from "./textureindex.js";
 export class Limb {
     constructor(startTriangle, offsetArray) {
         this.startTriangle = startTriangle;
@@ -89,15 +90,13 @@ export class Limb {
     /**
      * Draws all limbs in the limbs array
      * @param {Limb[]} limbs Array of limbs to draw 
-     * @param {String} texture Texture to map to the triangles
      */
-    static drawLimbs(limbs, texture){
-        Triangle.setupTexture(texture);
+    static drawLimbs(limbs){
         for (let i = 0; i < limbs.length; i++){
             limbs[i].draw();
         }
-        Triangle.renderBuffer();
-        Triangle.clearTextureBuffer();
+        
+        Triangle.renderBuffer(TextureIndex.Bark);
     }
 
     static makeOffsets(limbType) {
