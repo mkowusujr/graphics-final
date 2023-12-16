@@ -86,8 +86,8 @@ export class Triangle {
 		}
 	}
 
-	static setupTexture(textureFile) {
-		(async () => {
+	static async setupTexture(textureFile) {
+		// ( () => {
 			let texture = gl.createTexture();
 			const textureImg = new Image();
 
@@ -100,7 +100,7 @@ export class Triangle {
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 
 			Triangle.textures.push(texture);
-		})();
+		// })();
 	}
 
 	static setupDrawingBuffers() {

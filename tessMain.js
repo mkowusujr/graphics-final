@@ -8,6 +8,7 @@ import { gotKey } from "./utils/controls.js";
 import { LimbType } from "./models/limbtype.js";
 import { genRandValue } from "./utils/utils.js";
 import { Limb } from "./models/limb.js";
+import { TextureIndex } from "./models/textureindex.js";
 
 // Global variables that are set and used across the application
 let canvas;
@@ -25,7 +26,7 @@ export function clearDataArrs(){
 }
 
 // Other globals with default values;
-var division1 = 20;
+var division1 = 10;
 var division2 = 10;
 
 // Setting up where the objects are displayed
@@ -163,8 +164,7 @@ function init() {
     gl.clearDepth(1.0);
 
     // init textures
-    Triangle.setupTexture("./shaders/bark.jpg");
-    Triangle.setupTexture("./shaders/dirt3.jpg");
+    TextureIndex.setupTextures();
 
     // Read, compile, and link your shaders
     initProgram();
