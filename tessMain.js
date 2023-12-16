@@ -67,8 +67,8 @@ export function createScene() {
     const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart, "./shaders/dirt3.jpg");
     const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart, "./shaders/bark.jpg");
 
-    // Limb.drawLimbs(roots);
-    // Limb.drawLimbs(branches); //todo remember to set texture at beginning, draw at end and remove texture at end
+    Limb.drawLimbs(roots, );
+    Limb.drawLimbs(branches, ); //todo remember to set texture at beginning, draw at end and remove texture at end
 }
 
 // Given an id, extract the content's of a shader script

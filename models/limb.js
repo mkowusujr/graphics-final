@@ -1,6 +1,7 @@
-import {genRandValue} from "../utils/utils.js"
+import { genRandValue } from "../utils/utils.js"
 import { Point } from "./point.js";
 import { Triangle } from "./triangle.js";
+import { TexturePos } from "./texturepos.js";
 export class Limb {
     constructor(startTriangle, offsetArray) {
         this.startTriangle = startTriangle;
@@ -34,6 +35,9 @@ export class Limb {
         return tris;
     }
 
+    /**
+     * Goes through all segments of the limb and draws segments and tips accordingly
+     */
     draw() {
         let baseTriangles = this.limbConstructTriangle();
         for (let i = 0; i < baseTriangles.length; i++) {
@@ -46,13 +50,23 @@ export class Limb {
         }
     }
 
+    /**
+     * Draw a cone without a base at the end of the root, aka a tip
+     * @param {Triangle} baseTri Base of the cone
+     * @param {Point} tipPoint Tip point of the cone
+     */
     drawTip(baseTri, tipPoint) {
         const baseTriPoints = [baseTri.point0, baseTri.point1, baseTri.point2];
         for (let i = 0; i < 3; i++) {
-            Triangle.create(tipPoint, baseTriPoints[i], baseTriPoints[(i + 1) % 3]).draw();
+            Triangle.create(tipPoint, baseTriPoints[i], baseTriPoints[(i + 1) % 3]).draw(TexturePos.BOTTOM);
         }
     }
 
+    /**
+     * Draw the walls of a cylinder with a triangle base, aka a segment
+     * @param {Triangle} curBaseTri Bottom base of the cylinder
+     * @param {Triangle} nxtBaseTri Top base of the cylinder
+     */
     drawSegment(curBaseTri, nxtBaseTri) {
         const curBaseTriPoints = [curBaseTri.point0, curBaseTri.point1, curBaseTri.point2];
         const nxtBaseTriPoints = [nxtBaseTri.point0, nxtBaseTri.point1, nxtBaseTri.point2];
@@ -62,20 +76,28 @@ export class Limb {
                 curBaseTriPoints[(i + 1) % 3],
                 nxtBaseTriPoints[(i + 1) % 3],
                 curBaseTriPoints[i]
-            ).draw();
+            ).draw(TexturePos.TOP);
 
             Triangle.create(
                 nxtBaseTriPoints[i],
                 curBaseTriPoints[i],
                 nxtBaseTriPoints[(i + 1) % 3]
-            ).draw();
+            ).draw(TexturePos.BOTTOM);
         }
     }
 
-    static drawLimbs(limbs){
+    /**
+     * Draws all limbs in the limbs array
+     * @param {Limb[]} limbs Array of limbs to draw 
+     * @param {String} texture Texture to map to the triangles
+     */
+    static drawLimbs(limbs, texture){
+        Triangle.setupTexture(texture);
         for (let i = 0; i < limbs.length; i++){
             limbs[i].draw();
         }
+        Triangle.renderBuffer();
+        Triangle.clearTextureBuffer();
     }
 
     static makeOffsets(limbType) {
@@ -102,6 +124,7 @@ export class Limb {
      * @param {*} percentChance Percent chance that a triangle becomes a limb
      * @param {*} numTriangles Number of triangles in the object (not including shape tops)
      * @param {*} percentTriangles Percent of triangles that can be limbs
+     * @param {*} texture Texture to map to the triangles
      */
     static decideLimbs(limbType, limbs, percentChance, numTriangles, percentTriangles) {
         const p = Math.round(numTriangles * percentTriangles)

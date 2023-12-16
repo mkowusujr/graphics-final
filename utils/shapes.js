@@ -61,8 +61,8 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim, branch
                 // Draw Top Face
                 let tTop = Triangle.create([
                     origin.x, origin.y + r.y, origin.z,
-                x1, origin.y + r.y, z1,
-                x0, origin.y + r.y, z0]);
+                    x1, origin.y + r.y, z1,
+                    x0, origin.y + r.y, z0]);
                 triangleIndex = checkDraw(triangleIndex, branches, branchOffsets, tTop, cylinderStart, TexturePos.TOP);
             }
             else 
