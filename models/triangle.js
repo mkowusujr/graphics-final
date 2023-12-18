@@ -144,7 +144,7 @@ export class Triangle {
 
 	static renderTriangle(textureIndex) {
 		let indices = getIndices();
-		// console.log(Triangle.texture)
+		
 
 		// Bind the VAO
 		gl.bindVertexArray(myVAO);
