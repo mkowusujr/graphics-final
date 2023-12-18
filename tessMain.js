@@ -77,7 +77,7 @@ export function createScene() {
     const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart);
 
     Limb.drawLimbs(roots, );
-    Limb.drawLimbs(branches, ); //todo remember to set texture at beginning, draw at end and remove texture at end
+    Limb.drawLimbs(branches, );
 }
 
 // Given an id, extract the content's of a shader script

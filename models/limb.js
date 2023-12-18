@@ -140,7 +140,6 @@ export class Limb {
         return offsetArray;
     }
 
-    //todo each section always goes out in the same dir
     /**
      * Decide which triangles will become limbs
      * @param {*} limbType Enum of Root or Branch, determines if yShift is +/-
@@ -154,7 +153,7 @@ export class Limb {
         const p = Math.round(numTriangles * percentTriangles)
 
         for (let i = 0; i < p; i++) {
-            if (Math.random() < percentChance) { //todo tweak percentChance for number of triangles
+            if (Math.random() < percentChance) {
                 limbs.push(this.makeOffsets(limbType));
             }
             else {

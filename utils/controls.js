@@ -7,7 +7,6 @@ let angleInc = 5.0;
 const translationsReset = [0.0, 0.0, 0.25];
 let translations = [...translationsReset];
 let translationInc = 0.05;
-const translationMinZ = 0; //todo
 
 export const getAngles = () => angles;
 export const getTranslations = () => translations;

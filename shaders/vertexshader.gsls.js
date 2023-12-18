@@ -37,7 +37,7 @@ export const vertexshader =
 
         mat4 tscxyz = mat4 (tsc[2], 0.0, 0.0, tsc[0],
                           0.0, tsc[2], 0.0, tsc[1],
-                          0.0, 0.0, tsc[2], 0.0/*tsc[2]*/,//TODO tsc[2]
+                          0.0, 0.0, tsc[2], 0.0,
                           0.0, 0.0, 0.0, 1.0);
         gl_Position = rz * ry * rx * aVertexPosition * tscxyz;
         vbc = bary;
