@@ -51,6 +51,13 @@ export class Limb {
         }
     }
 
+    findMidpoint(p0, p1) {
+    return Point.create(
+        (p0.x + p1.x) / 2,
+        (p0.y + p1.y) / 2,
+        (p0.z + p1.z) / 2);
+    }
+
     /**
      * Draw a cone without a base at the end of the root, aka a tip
      * @param {Triangle} baseTri Base of the cone
@@ -58,8 +65,16 @@ export class Limb {
      */
     drawTip(baseTri, tipPoint) {
         const baseTriPoints = [baseTri.point0, baseTri.point1, baseTri.point2];
+        
+        let midpointOfSide = this.findMidpoint(baseTriPoints[0], baseTriPoints[1]);
+        let midpointOfTri = this.findMidpoint(baseTriPoints[2], midpointOfSide);
+
+        midpointOfTri.x += tipPoint.x;
+        midpointOfTri.y += tipPoint.y;
+        midpointOfTri.z += tipPoint.z;
+
         for (let i = 0; i < 3; i++) {
-            Triangle.create(tipPoint, baseTriPoints[i], baseTriPoints[(i + 1) % 3]).draw(TexturePos.BOTTOM, TextureIndex.Bark);
+            Triangle.create(midpointOfTri, baseTriPoints[i], baseTriPoints[(i + 1) % 3]).draw(TexturePos.BOTTOM, TextureIndex.Bark);
         }
     }
 
@@ -83,7 +98,7 @@ export class Limb {
                 nxtBaseTriPoints[i],
                 curBaseTriPoints[i],
                 nxtBaseTriPoints[(i + 1) % 3]
-            ).draw(TexturePos.BOTTOM, TextureIndex.Bark);
+            ).draw(TexturePos.TOP, TextureIndex.Bark);
         }
     }
 
@@ -102,12 +117,12 @@ export class Limb {
     static makeOffsets(limbType) {
         let offsetArray = [];
 
-        let numSeg = Math.round(genRandValue(1, 2));
+        let numSeg = Math.round(genRandValue(1, 5));
         let randX, randY, randZ
         for (let i = 0; i <= numSeg; i++) {
-            randX = genRandValue(-0.3, 0.3);
-            randY = genRandValue(0.1, 0.3) * limbType;
-            randZ = genRandValue(-0.3, 0.3);
+            randX = genRandValue(-0.2, 0.2);
+            randY = genRandValue(0.1, 0.5) * limbType;
+            randZ = genRandValue(-0.2, 0.2);
             let offsetPoint = Point.create([randX, randY, randZ]);
             offsetArray.push(offsetPoint);
         }

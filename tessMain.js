@@ -25,8 +25,8 @@ export function clearDataArrs(){
 }
 
 // Other globals with default values;
-var division1 = 10;
-var division2 = 10;
+var division1 = 20;
+var division2 = 20;
 
 // Setting up where the objects are displayed
 let dimForGround = { x: 1,y: 1, z: 1 };
@@ -54,12 +54,19 @@ const cylinderNumTriangles = division2 * division1 * 2;
 let rootOffsets = []
 let branchOffsets = []
 
-Limb.decideLimbs(LimbType.Root, rootOffsets, .1, hemisphereNumTriangles, .30)
-Limb.decideLimbs(LimbType.Branch, branchOffsets, .1, cylinderNumTriangles, .30)
-const hemisphereStart = Math.round(hemisphereNumTriangles * .10);
-const cylinderStart = Math.round(cylinderNumTriangles * .70) + division1;
+let limbRanges = {
+    hemisphereStartPct: .30,
+    hemisphereEndPct: .60,
+    hemisphereChanceRoot: .15,
+    cylinderStartPct: .70,
+    cylinderEndPct: 1.00,
+    cylinderChanceBranch: .08
+}
 
-
+Limb.decideLimbs(LimbType.Root, rootOffsets, limbRanges.hemisphereChanceRoot, hemisphereNumTriangles, limbRanges.hemisphereEndPct - limbRanges.hemisphereStartPct)
+Limb.decideLimbs(LimbType.Branch, branchOffsets, limbRanges.cylinderChanceBranch, cylinderNumTriangles, limbRanges.cylinderEndPct - limbRanges.cylinderStartPct)
+const hemisphereStart = Math.round(hemisphereNumTriangles * limbRanges.hemisphereStartPct);
+const cylinderStart = Math.round(cylinderNumTriangles * limbRanges.cylinderStartPct) + division1;
 
 export function createScene() {
     // Clear the scene
