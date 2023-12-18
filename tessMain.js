@@ -25,13 +25,13 @@ export function clearDataArrs(){
 }
 
 // Other globals with default values;
-var division1 = 20;
+var division1 = 30;
 var division2 = 20;
 
 // Setting up where the objects are displayed
-let dimForGround = { x: 1,y: 1, z: 1 };
+let dimForGround = { x: 2,y: 2, z: 2 };
 let originForGround = Point.create([0, 0, 0]);
-let dimForTrunk = { x: 1, y: 1, z: 1};
+let dimForTrunk = { x: 1, y: 2.5, z: 1};
 
 let minX = -(originForGround.x + dimForGround.x - dimForTrunk.x / 1.5),
     maxX = originForGround.x + dimForGround.x - dimForTrunk.x / 1.5;
@@ -47,7 +47,7 @@ let originForTrunk = Point.create([
     originForGround.z + randZ,
 ]);
 
-const hemisphereNumTriangles = (division2 - 1) * division1 * 2 + division1;
+const hemisphereNumTriangles = (division2 / 2 - 1) * division1 * 2 + division1;
 
 const cylinderNumTriangles = division2 * division1 * 2;
 
@@ -74,7 +74,7 @@ export function createScene() {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     
     const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart);
-    const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart);
+    const roots = makeHemisphere(division1, division2 / 2, originForGround, dimForGround, rootOffsets, hemisphereStart);
 
     Limb.drawLimbs(roots, );
     Limb.drawLimbs(branches, );

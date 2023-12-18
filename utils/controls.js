@@ -1,12 +1,13 @@
 import { createScene } from "../tessMain.js";
 
-const anglesReset = [0.0, 0.0, 0.0];
+const anglesReset = [-30.0, 0.0, 0.0];
 let angles = [...anglesReset];
 let angleInc = 5.0;
 
-const translationsReset = [0.0, 0.0, 0.25];
+const translationsReset = [0.0, -0.25, 0.2];
 let translations = [...translationsReset];
 let translationInc = 0.05;
+let scalingInc = 0.01;
 
 export const getAngles = () => angles;
 export const getTranslations = () => translations;
@@ -62,11 +63,11 @@ export function gotKey(event) {
 			break;
 		case 'q':
 			translationIndex = 2;
-			translationIncVal = translationInc;
+			translationIncVal = scalingInc;
 			break;
 		case 'e':
 			translationIndex = 2;
-			translationIncVal = -translationInc;
+			translationIncVal = -scalingInc;
 			break;
 		// Reset position and angle
 		case 'r':
@@ -77,8 +78,8 @@ export function gotKey(event) {
 	}
 	angles[angleIndex] += angleIncVal;
 	translations[translationIndex] += translationIncVal;
-	if (translations[2] < translationInc) {
-		translations[2] = translationInc;
+	if (translations[2] < scalingInc) {
+		translations[2] = scalingInc;
 	}
 
 	// Draw the updated scene

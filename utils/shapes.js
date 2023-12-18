@@ -26,12 +26,12 @@ export function makeCylinder(radialdivision, heightdivision, origin, dim, branch
     heightdivision = heightdivision < 1 ? 1 : heightdivision;
     radialdivision = radialdivision < 3 ? 3 : radialdivision;
     const r = { x: dim.x / 2, y: dim.y / 2, z: dim.z / 2 };
-    const t = 1 / heightdivision;
+    const t = dim.y / heightdivision;
     const beta = 2 * pi / radialdivision;
     let x0, x1, z0, z1;
 
     for (let u = -1; u <= heightdivision; u++) {
-        let y0 = origin.y - r.y + u * t;
+        let y0 = origin.y - (r.y) + u * t;
         let y1 = y0 + t;
 
         for (let i = 0; i < radialdivision; i++) {
@@ -119,7 +119,7 @@ export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisph
                 // Draw Bottom
                 let t = Triangle.create([
                         coords.x2, coords.y1, coords.z2,
-                        origin.x, origin.y - r, origin.z,
+                        origin.x, origin.y - r * dim.y, origin.z,
                     coords.x3, coords.y1, coords.z3]);
                 triangleIndex = checkDraw(triangleIndex, roots, rootOffsets, t, hemisphereStart, TexturePos.BOTTOM, TextureIndex.Dirt);
 

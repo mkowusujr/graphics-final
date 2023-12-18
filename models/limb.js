@@ -120,18 +120,24 @@ export class Limb {
 
         let numSeg = Math.round(genRandValue(1, 5));
         let randX, randY, randZ;
-        let minX = -0.2, maxX = 0.2, minZ = -0.2, maxZ = 0.2;
+        let minX = -0.2,
+            maxX = 0.2,
+            minZ = -0.2,
+            maxZ = 0.2,
+            minY = 0.1,
+            maxY = 0.3;
 
         if (limbType === LimbType.Branch) {
             minX -= 0.1;
             maxX += 0.1;
             minZ -= 0.1;
             maxZ += 0.1;
+            maxY += 0.2;
         }
 
         for (let i = 0; i <= numSeg; i++) {
             randX = genRandValue(minX, maxX);
-            randY = genRandValue(0.1, 0.5) * limbType;
+            randY = genRandValue(minY, maxY) * limbType;
             randZ = genRandValue(minZ, maxZ);
             let offsetPoint = Point.create([randX, randY, randZ]);
             offsetArray.push(offsetPoint);
