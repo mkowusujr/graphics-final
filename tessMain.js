@@ -1,7 +1,6 @@
 "use strict";
 import { makeCylinder, makeHemisphere } from "./utils/shapes.js";
 import { Point } from "./models/point.js";
-import { Triangle } from "./models/triangle.js";
 import { fragmentshader } from "./shaders/fragmentshader.gsls.js";
 import { vertexshader } from "./shaders/vertexshader.gsls.js";
 import { gotKey } from "./utils/controls.js";
@@ -12,7 +11,7 @@ import { TextureIndex } from "./models/textureindex.js";
 
 // Global variables that are set and used across the application
 let canvas;
-export let gl, program;
+export let gl, program; 
 
 let uvs = [], indices = [], points = [];
 
@@ -67,13 +66,11 @@ export function createScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     
-    
-    
     const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart);
     const roots = makeHemisphere(division1, division2, originForGround, dimForGround, rootOffsets, hemisphereStart);
 
-    // Limb.drawLimbs(roots, );
-    // Limb.drawLimbs(branches, ); //todo remember to set texture at beginning, draw at end and remove texture at end
+    Limb.drawLimbs(roots, );
+    Limb.drawLimbs(branches, ); //todo remember to set texture at beginning, draw at end and remove texture at end
 }
 
 // Given an id, extract the content's of a shader script
@@ -159,15 +156,12 @@ function init() {
 
     gl.cullFace(gl.BACK);
     gl.frontFace(gl.CCW);
-    // gl.clearColor(0.0, 0.0, 0.0, 1.0); todo
+   
     gl.depthFunc(gl.LEQUAL);
     gl.clearDepth(1.0);
 
     // init textures
-    TextureIndex.setupTextures();
-
-    // Read, compile, and link your shaders
-    initProgram();
+    TextureIndex.setupTextures().then(() => initProgram());
 }
 
 init();

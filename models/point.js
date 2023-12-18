@@ -18,8 +18,8 @@ export class Point {
 	 * @param {Number} z Z-coordinate
 	 * @returns {Point} The new Point
 	 */
-	static create(x, y, z) {
-		return new Point(x, y, z)();
+	static createWithXYZ(x, y, z) {
+		return new Point(x, y, z);
 	}
 
 	/**
@@ -27,8 +27,18 @@ export class Point {
 	 * @param {Array<Number>} coords Array containing x,y,z
 	 * @returns {Point} The new Point
 	 */
-	static create(coords) {
+	static createWithCoords(coords) {
 		return new Point(coords[0], coords[1], coords[2]);
+	}
+
+	static create(x, y, z)
+	{
+		if (y == null && z == null) {
+			return Point.createWithCoords(x);
+		}
+		else {
+			return Point.createWithXYZ(x, y, z);
+		}
 	}
 
 	/**

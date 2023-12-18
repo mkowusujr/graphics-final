@@ -72,7 +72,7 @@ export class Triangle {
 		const coords = [
 			this.point0.toArr(), //[x0, y0, z0],
 			this.point1.toArr(), //[x1, y1, z1],
-			this.point2.toArr(), //[x2, y2, z2],
+			this.point2.toArr() //[x2, y2, z2],
 		];
 
 		// Push all vertices
@@ -86,8 +86,7 @@ export class Triangle {
 		}
 	}
 
-	static async setupTexture(textureFile) {
-		// ( () => {
+	static  async setupTexture(textureFile) {
 			let texture = gl.createTexture();
 			const textureImg = new Image();
 
@@ -100,7 +99,6 @@ export class Triangle {
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 
 			Triangle.textures.push(texture);
-		// })();
 	}
 
 	static setupDrawingBuffers() {

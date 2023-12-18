@@ -2,7 +2,6 @@ import { Triangle } from "../models/triangle.js";
 import { Limb } from "../models/limb.js"
 import { TexturePos } from "../models/texturepos.js";
 import { TextureIndex } from "../models/textureindex.js";
-import { getPoints } from "../tessMain.js";
 import { Point } from "../models/point.js";
 const pi = Math.PI;
 let sin = (theta) => Math.sin(theta);

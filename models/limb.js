@@ -20,15 +20,15 @@ export class Limb {
             let triPoints = [];
 
             curTriPoints.forEach(c => {
-                triPoints.push([
+                triPoints.push(
                     Point.create(
                         c.x + offset.x,
                         c.y + offset.y,
                         c.z + offset.z)
-                ]);
+                );
             });
 
-            const tri = Triangle.create(triPoints);
+            const tri = Triangle.create(triPoints[0], triPoints[1], triPoints[2]);
             tris.push(tri);
             curTri = tri;
         }
@@ -59,7 +59,7 @@ export class Limb {
     drawTip(baseTri, tipPoint) {
         const baseTriPoints = [baseTri.point0, baseTri.point1, baseTri.point2];
         for (let i = 0; i < 3; i++) {
-            Triangle.create(tipPoint, baseTriPoints[i], baseTriPoints[(i + 1) % 3]).draw(TexturePos.BOTTOM);
+            Triangle.create(tipPoint, baseTriPoints[i], baseTriPoints[(i + 1) % 3]).draw(TexturePos.BOTTOM, TextureIndex.Bark);
         }
     }
 
@@ -77,13 +77,13 @@ export class Limb {
                 curBaseTriPoints[(i + 1) % 3],
                 nxtBaseTriPoints[(i + 1) % 3],
                 curBaseTriPoints[i]
-            ).draw(TexturePos.TOP);
+            ).draw(TexturePos.TOP, TextureIndex.Bark);
 
             Triangle.create(
                 nxtBaseTriPoints[i],
                 curBaseTriPoints[i],
                 nxtBaseTriPoints[(i + 1) % 3]
-            ).draw(TexturePos.BOTTOM);
+            ).draw(TexturePos.BOTTOM, TextureIndex.Bark);
         }
     }
 
@@ -102,12 +102,12 @@ export class Limb {
     static makeOffsets(limbType) {
         let offsetArray = [];
 
-        let randX = genRandValue(-0.3, 0.3);
-        let randY = genRandValue(0.1, 0.3) * limbType;
-        let randZ = genRandValue(-0.3, 0.3);
         let numSeg = Math.round(genRandValue(1, 2));
-
+        let randX, randY, randZ
         for (let i = 0; i <= numSeg; i++) {
+            randX = genRandValue(-0.3, 0.3);
+            randY = genRandValue(0.1, 0.3) * limbType;
+            randZ = genRandValue(-0.3, 0.3);
             let offsetPoint = Point.create([randX, randY, randZ]);
             offsetArray.push(offsetPoint);
         }
