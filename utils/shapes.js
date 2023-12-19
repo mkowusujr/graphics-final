@@ -128,8 +128,9 @@ export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisph
                 Triangle.create([
                         coords.x1, coords.y0, coords.z1,
                         origin.x, origin.y, origin.z,
-                    coords.x0, coords.y0, coords.z0,]).draw(TexturePos.TOP, TextureIndex.Dirt);
+                    coords.x0, coords.y0, coords.z0,]).draw(TexturePos.TOP, TextureIndex.Grass);
                 Triangle.pushToTopTexture();
+
             } else {
                 // Draw Sides
                 let triangle1 = Triangle.create([
@@ -143,11 +144,15 @@ export function makeHemisphere(slices, stacks, origin, dim, rootOffsets, hemisph
                         coords.x0, coords.y0, coords.z0,
                         coords.x3, coords.y1, coords.z3]);
                 triangleIndex = checkDraw(triangleIndex, roots, rootOffsets, triangle2, hemisphereStart, TexturePos.BOTTOM, TextureIndex.Dirt);
+                if (i == stacks -1 && j == slices -1)
+                {
+                    Triangle.renderBuffer(TextureIndex.Dirt);
+                }
             }
         }
     }
     
-    Triangle.renderBuffer(TextureIndex.Dirt);
+    Triangle.renderBuffer(TextureIndex.Grass);
     return roots;
 }
 
