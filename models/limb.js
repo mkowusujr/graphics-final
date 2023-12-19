@@ -10,14 +10,19 @@ export class Limb {
         this.offsetArray = offsetArray;
     }
 
-    limbConstructTriangle() {
+    constructTriangles() {
         let curTri = this.startTriangle;
         let tris = [curTri];
         let offset, curTriPoints;
 
         for (let i = 0; i < this.offsetArray.length - 1; i++) {
             offset = this.offsetArray[i];
-            curTriPoints = [curTri.point0, curTri.point1, curTri.point2];
+            curTriPoints = [
+                curTri.point0,
+                curTri.point1,
+                curTri.point2
+            ];
+
             let triPoints = [];
 
             curTriPoints.forEach(c => {
@@ -29,7 +34,12 @@ export class Limb {
                 );
             });
 
-            const tri = Triangle.create(triPoints[0], triPoints[1], triPoints[2]);
+            const tri = Triangle.create(
+                triPoints[0],
+                triPoints[1],
+                triPoints[2]
+            );
+
             tris.push(tri);
             curTri = tri;
         }
@@ -41,7 +51,7 @@ export class Limb {
      * Goes through all segments of the limb and draws segments and tips accordingly
      */
     draw() {
-        let baseTriangles = this.limbConstructTriangle();
+        let baseTriangles = this.constructTriangles();
         for (let i = 0; i < baseTriangles.length; i++) {
             if (i != baseTriangles.length - 1) {
                 this.drawSegment(baseTriangles[i], baseTriangles[i + 1]);
@@ -75,7 +85,11 @@ export class Limb {
         midpointOfTri.z += tipPoint.z;
 
         for (let i = 0; i < 3; i++) {
-            Triangle.create(midpointOfTri, baseTriPoints[i], baseTriPoints[(i + 1) % 3]).draw(TexturePos.BOTTOM, TextureIndex.Bark);
+            Triangle.create(
+                midpointOfTri,
+                baseTriPoints[i],
+                baseTriPoints[(i + 1) % 3]
+            ).draw(TexturePos.BOTTOM, TextureIndex.Bark);
         }
     }
 

@@ -8,7 +8,6 @@ var myVertexBuffer = null;
 var myUVBuffer = null;
 var myIndexBuffer = null;
 
-
 export class Triangle {
 	static texture;
 	static textures = [];
@@ -86,7 +85,7 @@ export class Triangle {
 		}
 	}
 
-	static  async setupTexture(textureFile) {
+	static async setupTexture(textureFile) {
 			let texture = gl.createTexture();
 			const textureImg = new Image();
 
@@ -145,7 +144,6 @@ export class Triangle {
 	static renderTriangle(textureIndex) {
 		let indices = getIndices();
 		
-
 		// Bind the VAO
 		gl.bindVertexArray(myVAO);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, myIndexBuffer);

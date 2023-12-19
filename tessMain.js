@@ -48,7 +48,6 @@ let originForTrunk = Point.create([
 ]);
 
 const hemisphereNumTriangles = (division2 / 2 - 1) * division1 * 2 + division1;
-
 const cylinderNumTriangles = division2 * division1 * 2;
 
 let rootOffsets = []
@@ -63,8 +62,19 @@ let limbRanges = {
     cylinderChanceBranch: .08
 }
 
-Limb.decideLimbs(LimbType.Root, rootOffsets, limbRanges.hemisphereChanceRoot, hemisphereNumTriangles, limbRanges.hemisphereEndPct - limbRanges.hemisphereStartPct)
-Limb.decideLimbs(LimbType.Branch, branchOffsets, limbRanges.cylinderChanceBranch, cylinderNumTriangles, limbRanges.cylinderEndPct - limbRanges.cylinderStartPct)
+Limb.decideLimbs(
+    LimbType.Root,
+    rootOffsets,
+    limbRanges.hemisphereChanceRoot,
+    hemisphereNumTriangles,
+    limbRanges.hemisphereEndPct - limbRanges.hemisphereStartPct);
+
+Limb.decideLimbs(LimbType.Branch,
+    branchOffsets,
+    limbRanges.cylinderChanceBranch,
+    cylinderNumTriangles,
+    limbRanges.cylinderEndPct - limbRanges.cylinderStartPct);
+
 const hemisphereStart = Math.round(hemisphereNumTriangles * limbRanges.hemisphereStartPct);
 const cylinderStart = Math.round(cylinderNumTriangles * limbRanges.cylinderStartPct) + division1;
 
