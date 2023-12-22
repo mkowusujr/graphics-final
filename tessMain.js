@@ -25,8 +25,8 @@ export function clearDataArrs(){
 }
 
 // Other globals with default values;
-var division1 = 30;
-var division2 = 20;
+var radialDiv = 30;
+var heightDiv = 20;
 
 // Setting up where the objects are displayed
 let dimForGround = { x: 2,y: 2, z: 2 };
@@ -47,18 +47,18 @@ let originForTrunk = Point.create([
     originForGround.z + randZ,
 ]);
 
-const hemisphereNumTriangles = (division2 / 2 - 1) * division1 * 2 + division1;
-const cylinderNumTriangles = division2 * division1 * 2;
+const hemisphereNumTriangles = heightDiv * radialDiv;
+const cylinderNumTriangles = (heightDiv * radialDiv * 2) + (radialDiv * 2);
 
 let rootOffsets = []
 let branchOffsets = []
 
 let limbRanges = {
-    hemisphereStartPct: .30,
-    hemisphereEndPct: .60,
+    hemisphereStartPct: .25,
+    hemisphereEndPct: .55,
     hemisphereChanceRoot: .15,
     cylinderStartPct: .70,
-    cylinderEndPct: 1.00,
+    cylinderEndPct: .95,
     cylinderChanceBranch: .08
 }
 
@@ -76,18 +76,18 @@ Limb.decideLimbs(LimbType.Branch,
     limbRanges.cylinderEndPct - limbRanges.cylinderStartPct);
 
 const hemisphereStart = Math.round(hemisphereNumTriangles * limbRanges.hemisphereStartPct);
-const cylinderStart = Math.round(cylinderNumTriangles * limbRanges.cylinderStartPct) + division1;
+const cylinderStart = Math.round(cylinderNumTriangles * limbRanges.cylinderStartPct) + radialDiv;
 
 export function createScene() {
     // Clear the scene
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     
-    const branches = makeCylinder(division1, division2, originForTrunk, dimForTrunk, branchOffsets, cylinderStart);
-    const roots = makeHemisphere(division1, division2 / 2, originForGround, dimForGround, rootOffsets, hemisphereStart);
+    const branches = makeCylinder(radialDiv, heightDiv, originForTrunk, dimForTrunk, branchOffsets, cylinderStart);
+    const roots = makeHemisphere(radialDiv, heightDiv / 2, originForGround, dimForGround, rootOffsets, hemisphereStart);
 
-    Limb.drawLimbs(roots, );
-    Limb.drawLimbs(branches, );
+    Limb.drawLimbs(roots);
+    Limb.drawLimbs(branches);
 }
 
 // Given an id, extract the content's of a shader script
